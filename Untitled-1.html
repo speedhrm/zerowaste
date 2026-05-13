@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Waste Scanner</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  font-family:"Kanit",sans-serif;
+  background:linear-gradient(160deg,#F1FFF6,#FFFBEF);
+  color:#1F2C25;
+}
+
+.app{
+  max-width:480px;
+  margin:auto;
+  min-height:100vh;
+  padding:18px;
+}
+
+.header{
+  text-align:center;
+  margin-bottom:18px;
+}
+
+.logo{
+  width:150px;
+  height:150px;
+  margin:10px auto 14px;
+  border-radius:50%;
+  background:linear-gradient(145deg,#A8EFC5,#63CB8D);
+  position:relative;
+  box-shadow:0 22px 48px rgba(55,181,110,.2);
+}
+
+.logo::before{
+  content:"";
+  position:absolute;
+  width:50px;
+  height:30px;
+  background:#28B866;
+  border-radius:100% 0 100% 0;
+  right:22px;
+  top:-6px;
+  transform:rotate(-25deg);
+}
+
+.eye{
+  position:absolute;
+  width:10px;
+  height:10px;
+  background:#1F2C25;
+  border-radius:50%;
+  top:70px;
+}
+
+.eye.left{left:55px}
+.eye.right{right:55px}
+
+.mouth{
+  position:absolute;
+  width:32px;
+  height:14px;
+  border-bottom:4px solid #1F2C25;
+  border-radius:50%;
+  left:59px;
+  top:83px;
+}
+
+.land1,.land2{
+  position:absolute;
+  background:#4DBF79;
+  border-radius:50%;
+}
+
+.land1{
+  width:58px;
+  height:38px;
+  top:38px;
+  left:34px;
+}
+
+.land2{
+  width:70px;
+  height:36px;
+  bottom:36px;
+  right:28px;
+}
+
+h1{
+  margin:0;
+  font-size:34px;
+  color:#168354;
+}
+
+p{
+  color:#6C7F72;
+  margin:6px 0;
+}
+
+.card{
+  background:white;
+  border-radius:26px;
+  padding:18px;
+  margin-bottom:16px;
+  box-shadow:0 14px 34px rgba(0,0,0,.07);
+}
+
+.camera-box{
+  width:100%;
+  height:330px;
+  background:#1F2C25;
+  border-radius:22px;
+  overflow:hidden;
+  position:relative;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:white;
+}
+
+video{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+
+#cameraText{
+  position:absolute;
+  text-align:center;
+}
+
+canvas{display:none}
+
+.preview{
+  width:100%;
+  border-radius:20px;
+  margin-top:12px;
+}
+
+button{
+  width:100%;
+  border:0;
+  border-radius:18px;
+  padding:14px;
+  background:#20A464;
+  color:white;
+  font-family:"Kanit";
+  font-size:15px;
+  font-weight:700;
+  cursor:pointer;
+}
+
+button.secondary{
+  background:#EAF8F0;
+  color:#168354;
+}
+
+button.danger{
+  background:#FFE7E7;
+  color:#C0392B;
+}
+
+.button-row{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin-top:14px;
+}
+
+.hidden{display:none!important}
+
+.result-box{
+  background:#F0FFF6;
+  border-radius:22px;
+  padding:18px;
+  text-align:center;
+  margin-bottom:16px;
+}
+
+.result-box h2{
+  color:#168354;
+  margin:6px 0;
+}
+
+select{
+  width:100%;
+  padding:14px;
+  border-radius:16px;
+  border:1px solid #DDE9E1;
+  font-family:"Kanit";
+  margin:10px 0 12px;
+}
+
+.bin-box{
+  border-radius:24px;
+  padding:20px;
+  text-align:center;
+  margin-bottom:16px;
+}
+
+.bin-yellow{
+  background:#FFF3B8;
+  color:#5F4600;
+}
+
+.bin-red{
+  background:#FFE1E1;
+  color:#B32626;
+}
+
+.bin-white{
+  background:white;
+  color:#1F2C25;
+  border:2px solid #DDE9E1;
+}
+
+.bin-blue{
+  background:#E2F1FF;
+  color:#1767A6;
+}
+
+ul{
+  padding-left:22px;
+}
+
+li{
+  margin-bottom:8px;
+}
+
+.loading{
+  animation:pulse 1.3s infinite;
+}
+
+@keyframes pulse{
+  0%,100%{opacity:1}
+  50%{opacity:.45}
+}
+
+.small{
+  font-size:13px;
+  color:#7B8B82;
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+  <div class="header">
+    <div class="logo">
+      <div class="land1"></div>
+      <div class="land2"></div>
+      <div class="eye left"></div>
+      <div class="eye right"></div>
+      <div class="mouth"></div>
+    </div>
+
+    <h1>AI Waste Scanner</h1>
+    <p>ถ่ายรูปขยะ แล้ว AI จะแนะนำถังสีและวิธีเตรียมก่อนทิ้ง</p>
+  </div>
+
+  <section class="card">
+    <div class="camera-box">
+      <video id="video" autoplay playsinline></video>
+      <canvas id="canvas"></canvas>
+      <div id="cameraText">กดเปิดกล้องเพื่อเริ่มใช้งาน</div>
+    </div>
+
+    <div class="button-row">
+      <button onclick="startCamera()">เปิดกล้อง</button>
+      <button class="secondary" onclick="captureImage()">ถ่ายรูป</button>
+    </div>
+  </section>
+
+  <section id="previewCard" class="card hidden">
+    <h3>รูปที่ถ่าย</h3>
+    <img id="previewImage" class="preview">
+    <button onclick="analyzeWaste()" style="margin-top:14px;">ให้ AI ตรวจสอบ</button>
+  </section>
+
+  <section id="resultCard" class="card hidden">
+    <div class="result-box">
+      <p>AI ตรวจพบว่าเป็น</p>
+      <h2 id="wasteName">กำลังตรวจสอบ...</h2>
+      <p id="confidenceText">Confidence: -</p>
+      <p id="reasonText" class="small"></p>
+    </div>
+
+    <p><strong>ผลถูกต้องไหม?</strong></p>
+
+    <div class="button-row">
+      <button onclick="confirmAIResult()">ถูกต้อง</button>
+      <button class="secondary" onclick="showManualSelect()">เลือกเอง</button>
+    </div>
+
+    <div id="manualSelect" class="hidden">
+      <select id="manualWaste">
+        <option value="">เลือกประเภทขยะเอง</option>
+        <option value="clear_bottle">ขวดน้ำใส</option>
+        <option value="cloudy_bottle">ขวดน้ำขุ่น</option>
+        <option value="milk_box">กล่องนม</option>
+        <option value="paper">กระดาษ</option>
+        <option value="can">กระป๋อง</option>
+        <option value="food_waste">เศษอาหาร</option>
+        <option value="contaminated">ขยะปนเปื้อน</option>
+        <option value="hazardous">ขยะอันตราย</option>
+        <option value="unknown">ไม่แน่ใจ</option>
+      </select>
+
+      <button onclick="useManualResult()">ยืนยันประเภทนี้</button>
+    </div>
+  </section>
+
+  <section id="guideCard" class="card hidden">
+    <h3>คำแนะนำก่อนทิ้ง</h3>
+
+    <div id="binColorBox" class="bin-box">
+      <h2 id="binColorText">-</h2>
+      <p id="binTypeText">-</p>
+    </div>
+
+    <ul id="guideList"></ul>
+
+    <button onclick="resetScan()">สแกนใหม่</button>
+  </section>
+
+</div>
+
+<script>
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw1HKZnhjuo_BEmYXXHGDjbfkwLlOKoIfoDjwwRUdWahBRLQ6XyYA7l7qnkRhLYywTS/exec";
+
+let capturedImageBase64 = "";
+let currentAIResult = null;
+
+const wasteDatabase = {
+  clear_bottle:{
+    name:"ขวดน้ำใส",
+    binColor:"สีเหลือง",
+    binClass:"bin-yellow",
+    binType:"ขยะรีไซเคิล",
+    guide:[
+      "เทน้ำที่เหลือออกให้หมด",
+      "ล้างหรือเขย่าน้ำให้สะอาดก่อนทิ้ง",
+      "แกะฉลากออกถ้าทำได้",
+      "บีบขวดให้แบนเพื่อลดพื้นที่จัดเก็บ",
+      "แยกฝาขวดออก หากพื้นที่มีจุดรับแยกฝา"
+    ]
+  },
+  cloudy_bottle:{
+    name:"ขวดน้ำขุ่น",
+    binColor:"สีเหลือง",
+    binClass:"bin-yellow",
+    binType:"ขยะรีไซเคิล",
+    guide:[
+      "เทของเหลวออกให้หมด",
+      "ล้างคราบน้ำหวานหรือคราบสกปรกก่อนทิ้ง",
+      "แกะฉลากออกถ้าทำได้",
+      "บีบขวดให้เล็กลงก่อนทิ้ง"
+    ]
+  },
+  milk_box:{
+    name:"กล่องนม",
+    binColor:"สีเหลือง",
+    binClass:"bin-yellow",
+    binType:"ขยะรีไซเคิล",
+    guide:[
+      "ดื่มหรือเทของเหลวออกให้หมด",
+      "ล้างด้านในกล่องเพื่อลดกลิ่นและคราบนม",
+      "ตัดหรือพับกล่องให้แบน",
+      "ผึ่งให้แห้งก่อนนำไปทิ้ง"
+    ]
+  },
+  paper:{
+    name:"กระดาษ",
+    binColor:"สีเหลือง",
+    binClass:"bin-yellow",
+    binType:"ขยะรีไซเคิล",
+    guide:[
+      "แยกเฉพาะกระดาษที่ไม่เปียกหรือไม่ปนเปื้อนอาหาร",
+      "ดึงลวดเย็บหรือเทปออกถ้าทำได้",
+      "พับหรือรวบรวมให้เป็นระเบียบก่อนทิ้ง"
+    ]
+  },
+  can:{
+    name:"กระป๋อง",
+    binColor:"สีเหลือง",
+    binClass:"bin-yellow",
+    binType:"ขยะรีไซเคิล",
+    guide:[
+      "เทน้ำหรือเศษอาหารออกให้หมด",
+      "ล้างคราบด้านในก่อนทิ้ง",
+      "บีบให้แบนถ้าปลอดภัย",
+      "ระวังขอบคมของกระป๋อง"
+    ]
+  },
+  food_waste:{
+    name:"เศษอาหาร",
+    binColor:"สีขาว",
+    binClass:"bin-white",
+    binType:"ขยะอินทรีย์ / ขยะเปียก",
+    guide:[
+      "แยกเศษอาหารออกจากบรรจุภัณฑ์",
+      "เทน้ำแกงหรือน้ำส่วนเกินออกก่อน",
+      "ทิ้งในถังขยะเปียกหรือถังอินทรีย์ที่กำหนด"
+    ]
+  },
+  contaminated:{
+    name:"ขยะปนเปื้อน",
+    binColor:"สีน้ำเงิน",
+    binClass:"bin-blue",
+    binType:"ขยะทั่วไป",
+    guide:[
+      "ใช้สำหรับขยะที่รีไซเคิลไม่ได้หรือปนเปื้อนมาก",
+      "ห่อให้มิดชิดถ้ามีกลิ่นหรือคราบสกปรก",
+      "ไม่ควรปะปนกับขยะรีไซเคิล"
+    ]
+  },
+  hazardous:{
+    name:"ขยะอันตราย",
+    binColor:"สีแดง",
+    binClass:"bin-red",
+    binType:"ขยะอันตราย",
+    guide:[
+      "ห้ามทิ้งรวมกับขยะทั่วไป",
+      "แยกใส่ภาชนะหรือถุงที่ปลอดภัย",
+      "ถ้าเป็นแบตเตอรี่ควรปิดขั้วด้วยเทป",
+      "นำไปทิ้งที่จุดรับขยะอันตรายเท่านั้น"
+    ]
+  },
+  unknown:{
+    name:"ไม่แน่ใจ",
+    binColor:"สีน้ำเงิน",
+    binClass:"bin-blue",
+    binType:"ขยะทั่วไป / รอเจ้าหน้าที่ตรวจสอบ",
+    guide:[
+      "หากไม่แน่ใจ ไม่ควรทิ้งรวมกับรีไซเคิล",
+      "ตรวจสอบคู่มือแยกขยะของพื้นที่ก่อน",
+      "หากเป็นวัตถุอันตรายหรืออิเล็กทรอนิกส์ ให้ส่งจุดรับเฉพาะ"
+    ]
+  }
+};
+
+async function startCamera(){
+  try{
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video:{ facingMode:"environment" },
+      audio:false
+    });
+
+    const video = document.getElementById("video");
+    video.srcObject = stream;
+
+    document.getElementById("cameraText").classList.add("hidden");
+  }catch(error){
+    alert("ไม่สามารถเปิดกล้องได้ กรุณาเปิดผ่าน HTTPS หรือ localhost");
+  }
+}
+
+function captureImage(){
+  const video = document.getElementById("video");
+  const canvas = document.getElementById("canvas");
+
+  if(!video.srcObject){
+    alert("กรุณาเปิดกล้องก่อน");
+    return;
+  }
+
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+
+  const ctx = canvas.getContext("2d");
+  ctx.drawImage(video,0,0,canvas.width,canvas.height);
+
+  capturedImageBase64 = canvas.toDataURL("image/jpeg",0.85);
+
+  document.getElementById("previewImage").src = capturedImageBase64;
+  document.getElementById("previewCard").classList.remove("hidden");
+  document.getElementById("resultCard").classList.add("hidden");
+  document.getElementById("guideCard").classList.add("hidden");
+}
+
+async function analyzeWaste(){
+  if(!capturedImageBase64){
+    alert("กรุณาถ่ายรูปก่อน");
+    return;
+  }
+
+  if(!APPS_SCRIPT_URL || APPS_SCRIPT_URL.includes("PASTE_")){
+    alert("กรุณาใส่ APPS_SCRIPT_URL ก่อนใช้งาน AI จริง");
+    return;
+  }
+
+  document.getElementById("resultCard").classList.remove("hidden");
+  document.getElementById("wasteName").innerText = "กำลังตรวจสอบ...";
+  document.getElementById("wasteName").classList.add("loading");
+  document.getElementById("confidenceText").innerText = "AI is analyzing...";
+  document.getElementById("reasonText").innerText = "";
+
+  try{
+    const response = await fetch(APPS_SCRIPT_URL,{
+      method:"POST",
+      body:JSON.stringify({
+        imageBase64:capturedImageBase64
+      })
+    });
+
+    const result = await response.json();
+
+    const type = wasteDatabase[result.type] ? result.type : "unknown";
+
+    currentAIResult = {
+      type:type,
+      confidence:result.confidence || 0,
+      reason:result.reason || ""
+    };
+
+    document.getElementById("wasteName").classList.remove("loading");
+    document.getElementById("wasteName").innerText = wasteDatabase[type].name;
+    document.getElementById("confidenceText").innerText = `Confidence: ${currentAIResult.confidence}%`;
+    document.getElementById("reasonText").innerText = currentAIResult.reason;
+
+  }catch(error){
+    console.error(error);
+
+    document.getElementById("wasteName").classList.remove("loading");
+    document.getElementById("wasteName").innerText = "AI ตรวจไม่สำเร็จ";
+    document.getElementById("confidenceText").innerText = "กรุณาลองใหม่อีกครั้ง";
+  }
+}
+
+function confirmAIResult(){
+  if(!currentAIResult){
+    alert("ยังไม่มีผลจาก AI");
+    return;
+  }
+
+  showGuide(currentAIResult.type);
+}
+
+function showManualSelect(){
+  document.getElementById("manualSelect").classList.remove("hidden");
+}
+
+function useManualResult(){
+  const selected = document.getElementById("manualWaste").value;
+
+  if(!selected){
+    alert("กรุณาเลือกประเภทขยะ");
+    return;
+  }
+
+  currentAIResult = {
+    type:selected,
+    confidence:100,
+    reason:"ผู้ใช้งานเลือกประเภทขยะเอง"
+  };
+
+  document.getElementById("wasteName").innerText = wasteDatabase[selected].name;
+  document.getElementById("confidenceText").innerText = "User Confirmed";
+  document.getElementById("reasonText").innerText = "ผู้ใช้งานยืนยันประเภทขยะเอง";
+
+  showGuide(selected);
+}
+
+function showGuide(type){
+  const data = wasteDatabase[type];
+
+  const binBox = document.getElementById("binColorBox");
+  binBox.className = `bin-box ${data.binClass}`;
+
+  document.getElementById("binColorText").innerText = `ทิ้งถัง${data.binColor}`;
+  document.getElementById("binTypeText").innerText = data.binType;
+
+  document.getElementById("guideList").innerHTML =
+    data.guide.map(item=>`<li>${item}</li>`).join("");
+
+  document.getElementById("guideCard").classList.remove("hidden");
+}
+
+function resetScan(){
+  capturedImageBase64 = "";
+  currentAIResult = null;
+
+  document.getElementById("previewCard").classList.add("hidden");
+  document.getElementById("resultCard").classList.add("hidden");
+  document.getElementById("guideCard").classList.add("hidden");
+  document.getElementById("manualSelect").classList.add("hidden");
+}
+</script>
+
+</body>
+</html>
