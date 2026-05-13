@@ -427,11 +427,13 @@ li{margin-bottom:8px}
       <p id="reasonText" class="small"></p>
     </div>
 
+    <div id="confirmSection" class="hidden">
     <p><strong>ผลที่ AI ตรวจถูกต้องไหม?</strong></p>
 
     <div class="button-row">
       <button onclick="confirmAIResult()">ถูกต้อง</button>
       <button class="secondary" onclick="showManualSelect()">ไม่ถูกต้อง</button>
+    </div>
     </div>
 
     <div id="manualSelect" class="hidden">
@@ -711,6 +713,8 @@ function retakePhoto(){
 }
 
 async function analyzeWaste(){
+  document.getElementById("confirmSection").classList.add("hidden");
+  document.getElementById("manualSelect").classList.add("hidden");
   if(!capturedImageBase64){
     alert("กรุณาถ่ายรูปก่อน");
     return;
@@ -753,8 +757,11 @@ async function analyzeWaste(){
     document.getElementById("wasteName").innerText = wasteDatabase[type].name;
     document.getElementById("confidenceText").innerText = `Confidence: ${currentAIResult.confidence}%`;
     document.getElementById("reasonText").innerText = currentAIResult.reason || "กรุณาตรวจสอบความถูกต้องก่อนยืนยัน";
+    document.getElementById("confirmSection").classList.remove("hidden");
 
   }catch(error){
+    document.getElementById("confirmSection").classList.add("hidden");
+    showManualSelect();
 
     console.error(error);
 
