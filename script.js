@@ -283,9 +283,9 @@ const wasteDatabase = {
 
     tissue:{
       name:"ทิชชู่",
-      binColor:"น้ำเงิน",
-      binClass:"bin-blue",
-      binType:"ขยะทั่วไป",
+      binColor:"ขาว",
+      binClass:"bin-white",
+      binType:"ขยะพลังงาน",
       icon:"🧻",
       guide:[
         "ไม่สามารถรีไซเคิลได้",
