@@ -1,5 +1,5 @@
 // ======================================================
-// Zero Waste AI Scanner V2
+// Zero Waste AI Scanner
 // - AI Camera and Events are separated into 2 tabs
 // - AI Camera supports multi-object result
 // - Events supports upcoming / future / past / cancelled
@@ -17,10 +17,23 @@ let stream = null;
 let currentEventFilter = "upcoming";
 
 // ======================================================
-// Waste Database: 30 Classes
+// Waste Database: 31 Classes
 // ======================================================
 
 const wasteDatabase = {
+    tumbler: {
+      name: "แก้วน้ำเก็บความเย็น / สแตนเลส",
+      binColor: "เหลือง", // หรือ เหลือง ตามนโยบายการแยกโลหะ
+      binClass:"bin-yellow",
+      binType:"ขยะรีไซเคิล",
+      icon: "🥤",
+      guide: [
+        "แยกฝาพลาสติกและยางรองออก",
+        "เทน้ำออกให้หมด",
+        "แต่ส่วนใหญ่เอาไปล้างแล้วใช้ต่อได้"
+      ]
+    },
+   
     food_waste:{
       name:"เศษอาหาร",
       binColor:"เขียว",
@@ -269,7 +282,7 @@ const wasteDatabase = {
     },
 
     dirty:{
-      name:"ขยะเลอะจัด",
+      name:"ขยะเลอะ",
       binColor:"น้ำเงิน",
       binClass:"bin-blue",
       binType:"ขยะทั่วไป",
@@ -471,7 +484,8 @@ function getBinKeyByWasteType(type){
     "paper_cup",
     "cutlery",
     "snack_wrapper",
-    "contaminated"
+    "contaminated",
+    "tissue"
   ].includes(type)){
     return "energy";
   }
@@ -493,7 +507,8 @@ function getBinKeyByWasteType(type){
     "box",
     "plastic",
     "glass",
-    "oil"
+    "oil",
+    "tumbler"
   ].includes(type)){
     return "recycle";
   }
@@ -579,6 +594,18 @@ async function startCamera(){
     document.getElementById("frozenImage").style.display = "none";
     document.getElementById("cameraText").classList.add("hidden");
 
+    // 🟢 เมื่อกล้องทำงานสำเร็จ: ซ่อนปุ่มเปิดกล้อง
+    if(document.getElementById("btnStartCamera")) {
+      document.getElementById("btnStartCamera").style.display = "none";
+    }
+    
+    // 🟢 ปรับปุ่มถ่ายรูปให้ยืดเต็มแถว และเปลี่ยนจากปุ่มสีอ่อน (.secondary) เป็นปุ่มสีเขียวหลักเด่นๆ
+    const btnCapture = document.getElementById("btnCapture");
+    if(btnCapture) {
+      btnCapture.style.gridColumn = "span 2";
+      btnCapture.classList.remove("secondary"); 
+    }
+
   }catch(error){
     console.error(error);
     alert("ไม่สามารถเปิดกล้องได้ กรุณาอนุญาตกล้อง และเปิดผ่าน HTTPS");
@@ -638,6 +665,18 @@ function retakePhoto(){
   document.getElementById("guideCard").classList.add("hidden");
   document.getElementById("manualSelect").classList.add("hidden");
   document.getElementById("detectedItemsSection").classList.add("hidden");
+
+  // 🟢 เมื่อกดถ่ายใหม่: ดึงปุ่มเปิดกล้องกลับคืนมาโชว์
+  if(document.getElementById("btnStartCamera")) {
+    document.getElementById("btnStartCamera").style.display = "block";
+  }
+  
+  // 🟢 รีเซ็ตปุ่มถ่ายรูปให้กลับไปเป็นขนาดปกติ และคืนคลาส .secondary (สีอ่อน) ตามดีไซน์แรกเข้าแอป
+  const btnCapture = document.getElementById("btnCapture");
+  if(btnCapture) {
+    btnCapture.style.gridColumn = "auto";
+    btnCapture.classList.add("secondary");
+  }
 }
 
 function resetScan(){
@@ -1160,19 +1199,15 @@ function renderCountdown(event){
   `;
 }
 
-function formatThaiDate(dateString){
-  const date = new Date(dateString);
-
-  return date.toLocaleDateString("th-TH", {
-    day:"numeric",
-    month:"short",
-    year:"numeric"
-  });
-}
-
 function renderEvents(){
   const list = document.getElementById("eventList");
-  list.innerHTML = "";
+  const hasOverallCard = document.querySelector(".overall-impact-card");
+
+  if (!hasOverallCard || currentEventFilter !== "past") {
+    list.innerHTML = "";
+  } else {
+    document.querySelectorAll(".event-card").forEach(card => card.remove());
+  }
 
   let events = eventDatabase
   .map(event => ({
@@ -1181,20 +1216,57 @@ function renderEvents(){
   }))
   .filter(event => event.computedStatus === currentEventFilter);
 
-if(currentEventFilter === "past"){
-  // ใหม่สุดขึ้นก่อน
-  events.sort((a,b)=>
-    new Date(b.date) - new Date(a.date)
-  );
-}else{
-  // Upcoming/Future เรียงใกล้สุดก่อน
-  events.sort((a,b)=>
-    new Date(a.date) - new Date(b.date)
-  );
-}
+  if(currentEventFilter === "past"){
+    events.sort((a,b)=> new Date(b.date) - new Date(a.date) );
+    
+    let totalWaste = 0;
+    let totalCo2 = 0;
+    let totalTrees = 0;
+
+    eventDatabase.forEach(ev => {
+      if(getEventComputedStatus(ev) === "past") {
+        totalWaste += Number(ev.wasteCollectedKg || 0);
+        totalCo2 += Number(ev.co2ReducedKg || 0);
+        totalTrees += Number(ev.treeEquivalent || 0);
+      }
+    });
+
+    if (!hasOverallCard) {
+      const overallCard = document.createElement("div");
+      overallCard.className = "overall-impact-card";
+      overallCard.innerHTML = `
+        <div class="overall-badge">🌱 OUR TOTAL CONTRIBUTION</div>
+        <div class="overall-header">ความสำเร็จร่วมกันของเรา</div>
+        <p class="overall-subtitle">จากกิจกรรม Zero Waste ทั้งหมดที่ผ่านมา</p>
+        
+        <div class="overall-grid">
+          <div class="overall-item">
+            <span class="overall-icon">♻️</span>
+            <div class="overall-num animate-num" data-target="${totalWaste}">0</div>
+            <div class="overall-lbl">ขยะรีไซเคิลสะสม (Kg.)</div>
+          </div>
+          <div class="overall-item">
+            <span class="overall-icon">🌍</span>
+            <div class="overall-num animate-num" data-target="${totalCo2}">0</div>
+            <div class="overall-lbl">ลดคาร์บอนสะสม (Kg.CO₂eq)</div>
+          </div>
+          <div class="overall-item">
+            <span class="overall-icon">🌳</span>
+            <div class="overall-num animate-num" data-target="${totalTrees}">0</div>
+            <div class="overall-lbl">เทียบเท่าปลูกต้นไม้ (ต้น)</div>
+          </div>
+        </div>
+      `;
+      list.appendChild(overallCard);
+    }
+  } else {
+    events.sort((a,b)=> new Date(a.date) - new Date(b.date) );
+  }
 
   if(events.length === 0){
-    list.innerHTML = `<p class="small">ยังไม่มีกิจกรรมในหมวดนี้</p>`;
+    if(currentEventFilter !== "past") {
+      list.innerHTML = `<p class="small">ยังไม่มีกิจกรรมในหมวดนี้</p>`;
+    }
     return;
   }
 
@@ -1207,9 +1279,12 @@ if(currentEventFilter === "past"){
     }else{
       card.innerHTML = renderActiveEvent(event);
     }
-
     list.appendChild(card);
   });
+
+  if (currentEventFilter === "past" && !hasOverallCard) {
+    animateCounters();
+  }
 }
 
 function renderActiveEvent(event){
@@ -1296,6 +1371,45 @@ function renderPastEvent(event){
 
     <div class="event-note">${event.detail}</div>
   `;
+}
+
+function formatThaiDate(dateString){
+  if (!dateString) return "-";
+  const date = new Date(dateString);
+  // ตรวจสอบเผื่อกรณีรูปแบบวันที่จาก Sheet ส่งมาผิดพลาด
+  if (isNaN(date.getTime())) return dateString; 
+
+  return date.toLocaleDateString("th-TH", {
+    day: "numeric",
+    month: "short",
+    year: "numeric"
+  });
+}
+
+function animateCounters() {
+  const counters = document.querySelectorAll('.animate-num');
+  const speed = 40; 
+  
+  console.log(`🏃‍♂️ [Debug Counter] เริ่มต้นการนับถอยหลังเอฟเฟกต์สำหรับกล่องตัวเลขจำนวน ${counters.length} ช่อง`);
+
+  counters.forEach((counter, index) => {
+    const target = +counter.getAttribute('data-target');
+    console.log(` └─ ช่องที่ [${index + 1}] ตั้งเป้าหมายตัวเลขไว้ที่: ${target}`);
+    
+    const animate = () => {
+      const current = +counter.innerText.replace(/,/g, '');
+      const increment = Math.ceil(target / speed);
+
+      if (current < target) {
+        counter.innerText = Math.min(target, current + increment).toLocaleString();
+        setTimeout(animate, 20);
+      } else {
+        counter.innerText = target.toLocaleString();
+        console.log(` 🎉 ช่องที่ [${index + 1}] วิ่งถึงเป้าหมาย [${target}] เรียบร้อยและจอดนิ่งสำเร็จ!`);
+      }
+    };
+    animate();
+  });
 }
 
 // ======================================================

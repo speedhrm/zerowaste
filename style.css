@@ -762,49 +762,48 @@ select{
 
 /* ===== Bottom Menu ===== */
 
-.green-menu{
-  position:fixed;
-  left:50%;
-  bottom:18px;
-
-  transform:translateX(-50%);
-
-  width:calc(100% - 32px);
-  max-width:440px;
-
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:10px;
-
-  padding:10px;
-
-  border-radius:28px;
-
-  background:
-    rgba(255,255,255,.72);
-
-  border:1px solid rgba(255,255,255,.55);
-
-  backdrop-filter:blur(22px);
-
-  box-shadow:
-    0 18px 40px rgba(16,37,27,.16);
-
-  z-index:999;
+.green-menu {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  transform: none;
+  width: 100%;
+  max-width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0px;
+  padding: 0px;
+  border-radius: 0px;
+  
+  background: #ffffff; /* ฐานขาวสะอาดตัดปัญหาความกลมกลืน */
+  border: none;
+  border-top: 1px solid #E3F0E6; /* เส้นแบ่งเขตจางๆ */
+  
+  box-shadow: 0 -8px 24px rgba(22, 53, 40, 0.06);
+  z-index: 999;
+  padding-bottom: env(safe-area-inset-bottom);
 }
 
-.green-menu-btn{
-  box-shadow:none;
-  border-radius:16px;
-  background:transparent;
-  color:#168354;
-  padding:12px;
+.green-menu-btn {
+  box-shadow: none;
+  border-radius: 0px;
+  background: transparent;
+  color: #839D8E; /* สถานะปกติใช้สีเทาอมเขียวจางๆ */
+  padding: 20px 12px; /* เพิ่มความสูงให้กดง่ายและดูพรีเมียม */
+  font-size: 15px;
+  font-weight: 700;
+  position: relative;
+  transition: color 0.2s ease;
 }
 
-.green-menu-btn.active{
-  background:linear-gradient(135deg,#20A464,#62D28F);
-  color:white;
-  box-shadow:0 8px 18px rgba(32,164,100,.18);
+/* ตอนปุ่มเปิดใช้งาน (Active) */
+.green-menu-btn.active {
+  background: transparent; /* ไม่ถมสีพื้นหลัง ปล่อยให้คลีน */
+  color: #12814F;          /* ตัวอักษรเด้งเป็นเขียวเข้ม */
+  font-weight: 800;
+  
+  /* เล่นลูกเล่นขีดเส้นหนาๆ วิ่งอยู่ขอบบนสุดของเมนู */
+  box-shadow: inset 0 4px 0 #20A464; 
 }
 
 .countdown{
@@ -988,4 +987,104 @@ select{
 .bin-summary-info.text-แดง strong,
 .bin-summary-info.text-แดง span{
   color:#d32f2f;
+}
+
+/* ================= Overall Impact Card ================= */
+
+.overall-impact-card {
+  background: linear-gradient(135deg, #126C45 0%, #193528 100%);
+  border: 2px solid #56E48F; /* เส้นขอบสีมินต์สว่างให้การ์ดดูติดไฟ เด้งหลุดออกมา */
+  border-radius: 28px;
+  padding: 24px 20px;
+  margin-bottom: 20px;
+  text-align: center;
+  color: #ffffff;
+  box-shadow: 0 20px 45px rgba(18, 108, 69, 0.25); /* เงาสีเขียวฟุ้ง */
+  position: relative;
+  overflow: hidden;
+}
+
+/* ลายแสงสะท้อนจางๆ ด้านหลังการ์ด */
+.overall-impact-card::before {
+  content: "";
+  position: absolute;
+  width: 150px;
+  height: 150px;
+  background: radial-gradient(circle, rgba(86, 228, 143, 0.15) 0%, transparent 70%);
+  top: -50px;
+  right: -50px;
+  pointer-events: none;
+}
+
+.overall-badge {
+  display: inline-block;
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  color: #56E48F;
+  margin-bottom: 10px;
+}
+
+.overall-header {
+  font-size: 24px;
+  font-weight: 900;
+  line-height: 1.2;
+  color: #ffffff;
+}
+
+.overall-subtitle {
+  font-size: 13px;
+  color: #A2C4B4;
+  margin: 4px 0 20px;
+}
+
+.overall-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 14px 10px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.overall-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.overall-icon {
+  font-size: 22px;
+  margin-bottom: 2px;
+}
+
+.overall-num {
+  font-size: 20px;
+  font-weight: 900;
+  color: #ffffff;
+  line-height: 1.1;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.overall-lbl {
+  font-size: 10px;
+  color: #DFEFE7;
+  margin-top: 5px;
+  line-height: 1.2;
+  opacity: 0.85;
+}
+
+@media (max-width: 380px) {
+  .overall-num {
+    font-size: 17px;
+  }
+  .overall-lbl {
+    font-size: 9px;
+  }
 }
