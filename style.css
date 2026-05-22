@@ -106,170 +106,28 @@ h2,h3,p{
   display:block;
 }
 
-/* ================= Earth mascot ================= */
+/* ================= brand logo ================= */
 
-.cute-earth{
-  width:150px;
-  height:150px;
-  margin:8px auto 14px;
-  border-radius:50%;
-  background:
-    radial-gradient(circle at 35% 28%, #B8F7FF 0 10%, transparent 11%),
-    radial-gradient(circle at 58% 62%, #63D98B 0 19%, transparent 20%),
-    radial-gradient(circle at 32% 62%, #4FC979 0 16%, transparent 17%),
-    radial-gradient(circle at 65% 32%, #77E39C 0 15%, transparent 16%),
-    linear-gradient(145deg,#8BE8FF,#4EB9F0);
-  position:relative;
-  box-shadow:
-    0 18px 38px rgba(53,165,112,.25),
-    inset -12px -14px 24px rgba(30,112,160,.16),
-    inset 10px 10px 20px rgba(255,255,255,.35);
-  overflow:visible;
-  animation:floatEarth 3s ease-in-out infinite;
+.brand-logo {
+    height: 140px;
+    width: auto;
+    display: block;
+    margin: 0 auto;
+    
+    /* เรียกใช้ animation ชื่อ floatEarth ที่คุณสร้างไว้ */
+    /* 3s คือความเร็ว, ease-in-out เพื่อให้ดูลื่นไหล, infinite คือให้วนลูปไม่สิ้นสุด */
+    animation: floatEarth 3s ease-in-out infinite;
 }
 
-.cute-earth::after{
-  content:"";
-  position:absolute;
-  inset:8px;
-  border-radius:50%;
-  border:3px solid rgba(255,255,255,.35);
+@keyframes floatEarth {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-10px); /* ปรับระยะลอยขึ้นลงตามชอบ (-6px ถึง -10px กำลังสวย) */
+    }
 }
 
-.leaf{
-  position:absolute;
-  width:38px;
-  height:24px;
-  background:linear-gradient(135deg,#5FE68A,#22B85D);
-  border-radius:100% 0 100% 0;
-  top:-10px;
-  right:30px;
-  transform:rotate(-22deg);
-  box-shadow:0 8px 14px rgba(29,151,83,.18);
-}
-
-.leaf::after{
-  content:"";
-  position:absolute;
-  width:18px;
-  height:3px;
-  background:rgba(255,255,255,.55);
-  top:11px;
-  left:9px;
-  transform:rotate(-18deg);
-  border-radius:999px;
-}
-
-.cloud{
-  position:absolute;
-  background:rgba(255,255,255,.88);
-  border-radius:999px;
-  z-index:2;
-}
-
-.cloud::before,
-.cloud::after{
-  content:"";
-  position:absolute;
-  background:rgba(255,255,255,.88);
-  border-radius:50%;
-}
-
-.cloud1{
-  width:42px;
-  height:14px;
-  top:38px;
-  left:18px;
-}
-
-.cloud1::before{
-  width:18px;
-  height:18px;
-  left:6px;
-  top:-9px;
-}
-
-.cloud1::after{
-  width:22px;
-  height:22px;
-  right:5px;
-  top:-12px;
-}
-
-.cloud2{
-  width:34px;
-  height:12px;
-  bottom:38px;
-  right:18px;
-}
-
-.cloud2::before{
-  width:15px;
-  height:15px;
-  left:5px;
-  top:-7px;
-}
-
-.cloud2::after{
-  width:18px;
-  height:18px;
-  right:4px;
-  top:-9px;
-}
-
-.eye{
-  position:absolute;
-  width:13px;
-  height:17px;
-  background:#173B31;
-  border-radius:50%;
-  top:68px;
-  z-index:3;
-}
-
-.eye::after{
-  content:"";
-  position:absolute;
-  width:4px;
-  height:4px;
-  background:white;
-  border-radius:50%;
-  top:3px;
-  left:3px;
-}
-
-.eye-left{left:52px}
-.eye-right{right:52px}
-
-.cheek{
-  position:absolute;
-  width:16px;
-  height:8px;
-  background:#FF9DB3;
-  border-radius:50%;
-  top:88px;
-  opacity:.75;
-  z-index:3;
-}
-
-.cheek-left{left:38px}
-.cheek-right{right:38px}
-
-.smile{
-  position:absolute;
-  width:30px;
-  height:15px;
-  border-bottom:4px solid #173B31;
-  border-radius:0 0 999px 999px;
-  left:60px;
-  top:82px;
-  z-index:3;
-}
-
-@keyframes floatEarth{
-  0%,100%{transform:translateY(0)}
-  50%{transform:translateY(-6px)}
-}
 
 /* ================= Camera ================= */
 
@@ -469,7 +327,7 @@ select{
 
 .bin-green{background:#DFFFEA;color:#168354}
 .bin-yellow{background:#FFF3B8;color:#6A4B00}
-.bin-white{background:#FFFFFF;color:#1F2C25;border:1px solid #DDE9E1}
+.bin-gray{background:#FFFFFF;color:#1F2C25;border:1px solid #DDE9E1}
 .bin-blue{background:#E2F1FF;color:#1767A6}
 .bin-red{background:#FFE1E1;color:#B32626}
 
@@ -974,8 +832,8 @@ select{
   color:#c99700;
 }
 
-.bin-summary-info.text-ขาว strong,
-.bin-summary-info.text-ขาว span{
+.bin-summary-info.text-เทา strong,
+.bin-summary-info.text-เทา span{
   color:#7a7a7a;
 }
 

@@ -179,8 +179,8 @@ const wasteDatabase = {
 
     sachet:{
       name:"ซอง / ฟอยล์",
-      binColor:"ขาว",
-      binClass:"bin-white",
+      binColor:"เทา",
+      binClass:"bin-gray",
       binType:"ขยะพลังงาน",
       icon:"🍫",
       guide:[
@@ -192,8 +192,8 @@ const wasteDatabase = {
 
     foam:{
       name:"โฟม",
-      binColor:"ขาว",
-      binClass:"bin-white",
+      binColor:"เทา",
+      binClass:"bin-gray",
       binType:"ขยะพลังงาน",
       icon:"🍱",
       guide:[
@@ -205,8 +205,8 @@ const wasteDatabase = {
 
     straw:{
       name:"หลอด",
-      binColor:"ขาว",
-      binClass:"bin-white",
+      binColor:"เทา",
+      binClass:"bin-gray",
       binType:"ขยะพลังงาน",
       icon:"🥤",
       guide:[
@@ -218,8 +218,8 @@ const wasteDatabase = {
 
     mask:{
       name:"หน้ากาก / ATK / แผงยา",
-      binColor:"ขาว",
-      binClass:"bin-white",
+      binColor:"เทา",
+      binClass:"bin-gray",
       binType:"ขยะพลังงาน",
       icon:"😷",
       guide:[
@@ -231,8 +231,8 @@ const wasteDatabase = {
 
     paper_cup:{
       name:"แก้วกระดาษ",
-      binColor:"ขาว",
-      binClass:"bin-white",
+      binColor:"เทา",
+      binClass:"bin-gray",
       binType:"ขยะพลังงาน",
       icon:"☕",
       guide:[
@@ -244,8 +244,8 @@ const wasteDatabase = {
 
     cutlery:{
       name:"ช้อนส้อมใช้แล้ว",
-      binColor:"ขาว",
-      binClass:"bin-white",
+      binColor:"เทา",
+      binClass:"bin-gray",
       binType:"ขยะพลังงาน",
       icon:"🍴",
       guide:[
@@ -257,8 +257,8 @@ const wasteDatabase = {
 
     snack_wrapper:{
       name:"พลาสติกห่อขนม",
-      binColor:"ขาว",
-      binClass:"bin-white",
+      binColor:"เทา",
+      binClass:"bin-gray",
       binType:"ขยะพลังงาน",
       icon:"🍬",
       guide:[
@@ -270,8 +270,8 @@ const wasteDatabase = {
 
     contaminated:{
       name:"ขยะเผาได้ปนเปื้อน",
-      binColor:"ขาว",
-      binClass:"bin-white",
+      binColor:"เทา",
+      binClass:"bin-gray",
       binType:"ขยะพลังงาน",
       icon:"🔥",
       guide:[
@@ -296,8 +296,8 @@ const wasteDatabase = {
 
     tissue:{
       name:"ทิชชู่",
-      binColor:"ขาว",
-      binClass:"bin-white",
+      binColor:"เทา",
+      binClass:"bin-gray",
       binType:"ขยะพลังงาน",
       icon:"🧻",
       guide:[
@@ -446,7 +446,7 @@ const binImageDatabase = {
   },
   energy: {
     label: "ขยะพลังงาน",
-    color: "ขาว",
+    color: "เทา",
     image: "images/energy.png"
   },
   ewaste: {
