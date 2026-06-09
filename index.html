@@ -3,57 +3,215 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Zero Waste AI Scanner V2</title>
+  <title>Zero Waste AI Scanner V3</title>
 
-  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css" />
 </head>
 
 <body>
   <div class="app">
 
-  <header class="header">
-    <div class="logo-wrapper">
-      <img src="images/logo.png" alt="Mascot Logo" class="brand-logo">
-    </div>
+    <header class="header">
+      <div class="logo-wrapper">
+        <img src="images/logo.png" alt="Mascot Logo" class="brand-logo">
+      </div>
+      <div class="badge">♻ Zero Waste AI</div>
+      <h1>Zero Waste</h1>
+      <p class="subtitle">App สำหรับช่วยแยกขยะสุดน่ารัก</p>
+    </header>
 
-    <div class="badge">♻ Zero Waste AI</div>
-    <h1>Zero Waste</h1>
-    <p class="subtitle">AI Camera + Events สำหรับช่วยแยกขยะสุดน่ารัก</p>
+    <!-- HOME -->
+    <main id="homePage" class="tab-page active">
 
-  </header>
+      <section class="home-welcome-card home-hero-v2">
+        <div>
+          <p>สวัสดีครับ 👋</p>
+          <h2>คุณ XXXXX</h2>
+          <span>วันนี้มาช่วยโลกให้สะอาดขึ้นอีกนิดกัน</span>
+        </div>
+        <img src="images/logo.png" alt="Zero Waste Logo">
+      </section>
 
-    <!-- ================= AI CAMERA PAGE ================= -->
-    <main id="aiPage" class="tab-page active">
+      <section class="eco-tip-card home-main-tip">
+        <div class="eco-tip-icon">
+          <i id="ecoTipIcon" data-lucide="lightbulb"></i>
+        </div>
+        <div>
+          <strong id="ecoTipTitle">Eco Tip Today</strong>
+          <span id="weatherEcoTip">กำลังเลือกคำแนะนำที่เหมาะกับวันนี้...</span>
+        </div>
+      </section>
 
+      <section class="home-weather-card">
+        <div class="weather-dashboard-grid">
+          <div class="weather-mini-card weather-box compact-weather">
+            <div class="weather-main-row">
+              <div class="weather-card-icon">
+                <i id="weatherIcon" data-lucide="cloud-sun"></i>
+              </div>
+              <div>
+                <div class="weather-main-value" id="weatherTemp">--°C</div>
+                <div class="weather-status" id="weatherDesc">Loading...</div>
+              </div>
+            </div>
+
+            <div class="weather-location-row">
+              <i data-lucide="map-pin"></i>
+              <span id="weatherLocation">กฟผ. สำนักงานใหญ่ บางกรวย</span>
+            </div>
+
+            <button class="use-location-btn" onclick="loadWeather()">
+              ใช้ตำแหน่งปัจจุบัน
+            </button>
+          </div>
+
+          <div class="weather-mini-card aqi-box compact-weather">
+            <div class="weather-main-row">
+              <div class="weather-card-icon">
+                <i data-lucide="leaf"></i>
+              </div>
+              <div>
+                <div class="weather-main-value" id="aqiValue">--</div>
+                <div class="aqi-inline-title">
+                  AQI <span class="aqi-badge" id="aqiLevel">Loading...</span>
+                </div>
+                <div class="aqi-desc" id="aqiDesc">กำลังเช็คคุณภาพอากาศ...</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="home-mission-card">
+        <div class="home-section-title">
+          <h3>Weekly Mission</h3>
+          <small>0 / 3 done</small>
+        </div>
+
+        <div class="mission-list">
+          <div class="mission-item done">
+            <span>✓</span>
+            <p>พกแก้วน้ำส่วนตัว</p>
+          </div>
+
+          <div class="mission-item">
+            <span>2</span>
+            <p>แยกขวดพลาสติก 5 ชิ้น</p>
+          </div>
+
+          <div class="mission-item">
+            <span>3</span>
+            <p>เปิด Flash Card อย่างน้อย 5 ใบ</p>
+          </div>
+        </div>
+
+        <div class="mission-progress">
+          <div style="width:33%;"></div>
+        </div>
+      </section>
+
+      <section class="home-card impact-highlight-card">
+        <div class="home-section-title">
+          <h3>My Impact</h3>
+          <small> For Green</small>
+        </div>
+
+        <div class="impact-highlight-grid">
+          <div>
+            <i data-lucide="recycle"></i>
+            <strong>0</strong>
+            <span>Waste Sorted</span>
+          </div>
+
+          <div>
+            <i data-lucide="leaf"></i>
+            <strong>0 kg</strong>
+            <span>CO₂ Reduced</span>
+          </div>
+
+          <div>
+            <i data-lucide="star"></i>
+            <strong>0 pts</strong>
+            <span>Green Score</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="home-card contribution-card contribution-v2">
+        <div class="home-section-title">
+          <h3>Our Contribution</h3>
+          <small>Organization</small>
+        </div>
+
+        <div class="contribution-big-row">
+          <div>
+            <strong>0</strong>
+            <span>Participants</span>
+          </div>
+          <div>
+            <strong>0</strong>
+            <span>Waste Sorted</span>
+          </div>
+          <div>
+            <strong>0 kg</strong>
+            <span>CO₂ Reduced</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="home-card org-leaderboard-card">
+        <div class="home-section-title">
+          <h3>Organization Leaderboard</h3>
+          <small>Mock Data</small>
+        </div>
+
+        <div id="orgLeaderboardList" class="org-leaderboard-list">
+          <!-- render by JS -->
+        </div>
+      </section>
+
+      <section class="home-quick-grid home-quick-grid-v2">
+        <button onclick="showTab('ai')">
+          <i data-lucide="scan-line"></i>
+          <strong>AI Scan</strong>
+          <span>ตรวจขยะด้วย AI</span>
+        </button>
+
+        <button onclick="showTab('learn')">
+          <i data-lucide="book-open"></i>
+          <strong>Knowledge Hub</strong>
+          <span>เรียนรู้และเล่นเกม</span>
+        </button>
+
+        <button onclick="showTab('events')">
+          <i data-lucide="calendar-days"></i>
+          <strong>Events</strong>
+          <span>กิจกรรม Zero Waste</span>
+        </button>
+
+        <button onclick="showTab('profile')">
+          <i data-lucide="user"></i>
+          <strong>Profile</strong>
+          <span>ดู Impact ส่วนตัว</span>
+        </button>
+      </section>
+
+    </main>
+
+    <!-- AI SCAN -->
+    <main id="aiPage" class="tab-page">
       <section class="card">
-          
-        <div class="camera-tip">
-            เพื่อความแม่นยำ ควรถ่ายขยะไม่เกิน 3 ชิ้นต่อภาพ
-          </div>
+        <div class="camera-tip">เพื่อความแม่นยำ ควรถ่ายขยะไม่เกิน 3 ชิ้นต่อภาพ</div>
 
-          <div class="camera-box">
-
-            <video id="video" autoplay playsinline></video>
-
-            <img
-              id="frozenImage"
-              alt="Captured waste preview"
-            />
-
-            <canvas id="canvas"></canvas>
-
-            <div class="zero-label">
-              ZERO WASTE SCANNER
-            </div>
-
-            <div class="camera-overlay"></div>
-
-            <div id="cameraText">
-              กดเปิดกล้องเพื่อเริ่มใช้งาน
-            </div>
-
-          </div>
+        <div class="camera-box">
+          <video id="video" autoplay playsinline></video>
+          <img id="frozenImage" alt="Captured waste preview" />
+          <canvas id="canvas"></canvas>
+          <div class="zero-label">ZERO WASTE SCANNER</div>
+          <div class="camera-overlay"></div>
+          <div id="cameraText">กดเปิดกล้องเพื่อเริ่มใช้งาน <br>(ขณะนี้ทำการปิด AI API อยู่)</div>
+        </div>
 
         <div id="cameraButtons" class="button-row">
           <button id="btnStartCamera" onclick="startCamera()">เปิดกล้อง</button>
@@ -80,7 +238,7 @@
         </div>
 
         <div id="confirmSection" class="hidden">
-          <p><strong> AI ตรวจถูกต้องไหม?</strong></p>
+          <p><strong>AI ตรวจถูกต้องไหม?</strong></p>
           <div class="button-row">
             <button onclick="confirmAIResult()">ถูกต้อง</button>
             <button class="secondary" onclick="showManualSelect()">ไม่ถูกต้อง</button>
@@ -102,14 +260,310 @@
         <h3>สรุปถังที่ต้องทิ้ง</h3>
         <div id="binSummaryList" class="bin-summary-list"></div>
 
+        <div id="speedMessageContainer"></div>
+
         <button onclick="resetScan()">สแกนใหม่</button>
+      </section>
+    </main>
+
+    <!-- LEARN -->
+    <main id="learnPage" class="tab-page">
+
+      <section id="learnMenuView">
+        <section class="card learn-hero-card">
+          <div class="learn-badge">🌱 Zero Waste Learning</div>
+          <h2>Learn & Play</h2>
+          <p class="small">เรียนรู้ เล่นเกม ทบทวนความรู้ และสะสมคะแนน</p>
+        </section>
+
+        <section class="card learn-content-card">
+          <h3>เลือกกิจกรรม</h3>
+
+          <button class="big-learn-card game-entry-card" onclick="openMatchGamePage()">
+            <div class="big-card-icon">🎮</div>
+            <div>
+              <strong>Match the Bin</strong>
+              <span>เกมจับคู่ขยะกับถังใน 60 วินาที</span>
+            </div>
+            <div class="big-card-arrow">›</div>
+          </button>
+
+          <button class="big-learn-card quiz-entry-card" onclick="openMiniQuizPage()">
+            <div class="big-card-icon">📝</div>
+            <div>
+              <strong>Mini Quiz</strong>
+              <span>แบบทดสอบ Zero Waste 10 ข้อ</span>
+            </div>
+            <div class="big-card-arrow">›</div>
+          </button>
+
+          <button class="big-learn-card speed-flash-entry-card" onclick="openSpeedFlashCardPage()">
+            <div class="big-card-icon">🃏</div>
+            <div>
+              <strong>SPEED x Zero Waste</strong>
+              <span>ทายว่าพฤติกรรมนี้เป็น SPEED ตัวไหน?</span>
+            </div>
+            <div class="big-card-arrow">›</div>
+          </button>
+        </section>
+
+        <section class="card resource-card">
+          <div class="home-section-title">
+            <h3>คลังความรู้ Zero Waste</h3>
+            <small id="resourceCounter">1 / 4</small>
+          </div>
+
+          <div id="resourceScrollRow" class="resource-scroll-row">
+            
+            <!-- TOPIC 1 !-->
+            <a class="resource-item"
+              href="assets/resources/2569_app SPEEDxEZW.pdf"
+              target="_blank"
+              rel="noopener">
+
+              <img class="resource-cover"
+                  src="assets/resources/2569_Cover1.PNG"
+                  alt="Zero Waste Application Cover">
+
+              <strong>Zero Waste Application</strong>
+              <small>คู่มือการใช้งาน App SPEED x EZW</small>
+
+              <span class="resource-view-label">View PDF</span>
+            </a>
+
+            <!-- TOPIC 2 !-->
+            <a class="resource-item"
+              href="assets/resources/2569_Hazardous_app_SPEEDxEZW.pdf"
+              target="_blank"
+              rel="noopener">
+
+              <img class="resource-cover"
+                src="assets/resources/2569_Cover2.PNG"
+                alt="Hazardous Waste Cover">
+
+              <strong>Hazardous Waste</strong>
+              <small>ความรู้เรื่องขยะอันตราย</small>
+
+              <span class="resource-view-label">View PDF</span>
+            </a>
+
+            <!-- TOPIC 3 !-->
+            <a class="resource-item"
+              href="assets/resources/2569_WUW_SPEEDxEZW.pdf"
+              target="_blank"
+              rel="noopener">
+
+              <img class="resource-cover"
+                  src="assets/resources/2569_Cover3.PNG"
+                  alt="Waste Upcycling Workshop Cover">
+
+              <strong>Waste Upcycling Workshop</strong>
+              <small>  กิจกรรมและแนวทาง Upcycling</small>
+
+              <span class="resource-view-label">View PDF</span>
+            </a>
+
+            <!-- TOPIC 4 !-->
+            <a class="resource-item"
+              href="assets/resources/2569_SPEEDxEZW.png"
+              target="_blank"
+              rel="noopener">
+
+              <img class="resource-cover"
+                  src="assets/resources/2569_SPEEDxEZW.png"
+                  alt="Waste Upcycling Workshop Cover">
+
+              <strong>SPEED x ZeroWaste</strong>
+              <small> ค่านิยมองค์การและ ZeroWaste</small>
+
+              <span class="resource-view-label">View JPG</span>
+            </a>
+
+          </div>
+
+          <div id="resourceDots" class="resource-dots"></div>
+        </section>
+      </section>
+
+      <!-- MATCH GAME -->
+      <section id="matchGamePage" class="match-game-page hidden">
+        <div class="game-page-header">
+          <button class="game-back-btn" onclick="backToLearnMenu()">←</button>
+          <div>
+            <h2>Match the Bin</h2>
+            <p>เลือกถังให้ถูกใน 60 วินาที</p>
+          </div>
+          <div class="game-time-bubble">
+            <span id="gameTimer">60</span>
+            <small>SECONDS</small>
+          </div>
+        </div>
+
+        <div class="game-score-strip">
+          <div><span>Score</span><strong id="gameScore">0</strong></div>
+          <div><span>Combo</span><strong id="gameCombo">0</strong></div>
+        </div>
+
+        <div id="gameQuestionCard" class="game-question-card big-game-question">
+          <div class="game-emoji">🎲</div>
+          <div class="game-item-name">พร้อมเล่นหรือยัง?</div>
+          <div class="game-hint">เริ่มจากข้อง่าย แล้วค่อย ๆ ยากขึ้น</div>
+        </div>
+
+        <div id="gameFeedback" class="game-feedback hidden"></div>
+
+        <div id="gameBinWrapper" class="hidden">
+          <div id="gameBinChoices" class="game-bin-grid game-bin-grid-full">
+            <button onclick="answerGame('recycle')" class="bin-choice recycle-choice"><span>🟡</span><strong>รีไซเคิล</strong></button>
+            <button onclick="answerGame('organic')" class="bin-choice organic-choice"><span>🟢</span><strong>อินทรีย์</strong></button>
+            <button onclick="answerGame('general')" class="bin-choice general-choice"><span>🔵</span><strong>ทั่วไป</strong></button>
+            <button onclick="answerGame('hazard')" class="bin-choice hazard-choice"><span>🔴</span><strong>อันตราย</strong></button>
+            <button onclick="answerGame('energy')" class="bin-choice energy-choice"><span>⚪</span><strong>พลังงาน</strong></button>
+          </div>
+        </div>
+
+        <button id="startGameBtn" class="game-start-btn" onclick="startMatchGame()">Start Game</button>
+      </section>
+
+      <section id="matchResultPage" class="match-result-page hidden">
+        <div class="result-trophy">🏆</div>
+        <h2>จบเกมแล้ว!</h2>
+        <p class="small">คะแนนรอบนี้ของคุณ</p>
+
+        <div class="final-score-card">
+          <strong id="finalGameScore">0</strong>
+          <span>points</span>
+        </div>
+
+        <section class="leaderboard-card">
+          <h3>Leaderboard</h3>
+          <div id="leaderboardList" class="leaderboard-list"></div>
+        </section>
+
+        <div class="button-row">
+          <button onclick="restartMatchGame()">เล่นใหม่</button>
+          <button class="secondary" onclick="backToLearnMenu()">กลับเมนู</button>
+        </div>
+      </section>
+
+      <!-- MINI QUIZ -->
+      <section id="miniQuizPage" class="mini-quiz-page hidden">
+        <div class="game-page-header">
+          <button class="game-back-btn" onclick="backToLearnMenu()">←</button>
+          <div>
+            <h2>Mini Quiz</h2>
+            <p>ตอบคำถาม Zero Waste 10 ข้อ</p>
+          </div>
+          <div class="game-time-bubble">
+            <span id="quizScoreText">0</span>
+            <small>SCORE</small>
+          </div>
+        </div>
+
+        <div class="quiz-progress">
+          <div class="quiz-progress-top">
+            <span id="quizProgressText">Question 1 / 10</span>
+            <strong id="quizPercentText">10%</strong>
+          </div>
+          <div class="quiz-progress-bar">
+            <div id="quizProgressFill"></div>
+          </div>
+        </div>
+
+        <section class="card quiz-card">
+          <div id="quizQuestionText" class="quiz-question-text"></div>
+          <div id="quizChoices" class="quiz-choices"></div>
+          <div id="quizFeedback" class="quiz-feedback hidden"></div>
+          <button id="quizNextBtn" class="hidden" onclick="nextQuizQuestion()">ข้อต่อไป</button>
+        </section>
+      </section>
+
+      <section id="miniQuizResultPage" class="match-result-page hidden">
+        <div class="result-trophy">🎉</div>
+        <h2>Quiz Complete!</h2>
+        <p class="small">คะแนนที่คุณทำได้</p>
+
+        <div class="final-score-card">
+          <strong id="finalQuizScore">0 / 10</strong>
+          <span id="finalQuizPercent">0%</span>
+        </div>
+
+        <div class="button-row">
+          <button onclick="restartMiniQuiz()">ทำอีกครั้ง</button>
+          <button class="secondary" onclick="backToLearnMenu()">กลับเมนู</button>
+        </div>
+      </section>
+
+      <!-- SPEED FLASH CARD PAGE -->
+      <section id="speedFlashCardPage" class="speed-flash-page hidden">
+
+        <div class="game-page-header">
+          <button class="game-back-btn" onclick="backToLearnMenu()">←</button>
+
+          <div>
+            <h2>SPEED Flash Card</h2>
+            <p>เรียนรู้ SPEED ผ่านพฤติกรรม Zero Waste</p>
+          </div>
+        </div>
+
+        <div class="flash-progress">
+           <div class="flash-progress-bar">
+            <div id="flashProgressFill"></div>
+          </div>
+        </div>
+
+        <div id="flashCard" class="flash-card" onclick="flipSpeedFlashCard()">
+          <div class="flash-card-inner">
+
+            <div class="flash-card-front">
+              <div id="flashCardIcon" class="flash-icon">♻️</div>
+
+              <div class="flash-front-label">พฤติกรรม Zero Waste</div>
+
+              <div id="flashCardBehavior" class="flash-behavior">
+                กำลังโหลดการ์ด...
+              </div>
+
+              <div class="flash-question">
+                พฤติกรรมนี้สะท้อน SPEED ข้อใด?
+              </div>
+
+              <div class="flash-hint">แตะการ์ดเพื่อดูเฉลย</div>
+            </div>
+
+            <div class="flash-card-back">
+              <div id="flashAnswerIcon" class="flash-answer-icon">💚</div>
+
+              <div id="flashAnswerTitle" class="flash-answer-title">
+                EMPATHY
+              </div>
+
+              <div id="flashAnswerDescription" class="flash-answer-description">
+                ใส่ใจผู้อื่นและส่วนรวม
+              </div>
+
+              <div class="flash-back-hint">แตะอีกครั้งเพื่อกลับด้านหน้า</div>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="flash-nav">
+          <button id="flashPrevBtn" class="secondary" onclick="previousFlashCard()">
+            ◀ ก่อนหน้า
+          </button>
+
+          <button id="flashNextBtn" onclick="nextFlashCard()">
+            ถัดไป ▶
+          </button>
+        </div>
+
       </section>
 
     </main>
 
-    <!-- ================= EVENTS PAGE ================= -->
+    <!-- EVENTS -->
     <main id="eventsPage" class="tab-page">
-
       <section class="card">
         <div class="section-title-row">
           <div>
@@ -120,7 +574,6 @@
 
         <div class="event-filter-row">
           <div id="filterIndicator" class="filter-indicator"></div>
-
           <button class="filter-btn active" onclick="setEventFilter('upcoming', 0)">Upcoming</button>
           <button class="filter-btn" onclick="setEventFilter('future', 1)">Future</button>
           <button class="filter-btn" onclick="setEventFilter('past', 2)">Past</button>
@@ -129,21 +582,59 @@
 
         <div id="eventList" class="event-list"></div>
       </section>
+    </main>
 
+    <!-- PROFILE -->
+    <main id="profilePage" class="tab-page">
+      <section class="card profile-hero-card">
+        <div class="profile-avatar">👤</div>
+        <h2>My Profile</h2>
+        <p class="small">พื้นที่สำหรับสรุปคะแนน การเรียนรู้ ประวัติการสแกน และ Impact ส่วนบุคคล</p>
+        <div class="profile-placeholder">Coming soon: เชื่อมต่อ API และฐานข้อมูลภายใน</div>
+      </section>
     </main>
 
   </div>
-  
-    <nav class="green-menu">
-      <button id="aiTabBtn" class="green-menu-btn active" onclick="showTab('ai')">
-        📷 AI Camera
-      </button>
 
-      <button id="eventTabBtn" class="green-menu-btn" onclick="showTab('events')">
-        📅 Events
-      </button>
-    </nav>
+  <!-- BOTTOM MENU -->
+  <nav class="green-menu">
+    <button id="homeTabBtn" class="green-menu-btn active" onclick="showTab('home')">
+      <i data-lucide="home"></i>
+      <span>Home</span>
+    </button>
 
-  <script src="script.js?v=9999"></script>
+    <button id="knowledgeTabBtn" class="green-menu-btn" onclick="showTab('learn')">
+      <i data-lucide="book-open"></i>
+      <span>Knowledge Hub</span>
+    </button>
+
+    <div class="scan-menu-wrap">
+      <button id="scanTabBtn" class="green-menu-scan" onclick="showTab('ai')">
+        <i data-lucide="scan-line"></i>
+      </button>
+      <span class="scan-menu-label">AI Scan</span>
+    </div>
+
+    <button id="eventTabBtn" class="green-menu-btn" onclick="showTab('events')">
+      <i data-lucide="calendar-days"></i>
+      <span>Events</span>
+    </button>
+
+    <button id="profileTabBtn" class="green-menu-btn" onclick="showTab('profile')">
+      <i data-lucide="user"></i>
+      <span>Profile</span>
+    </button>
+  </nav>
+
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="config.js"></script>
+  <script src="data.js"></script>
+  <script src="user.js"></script>
+  <script src="weather.js"></script>
+  <script src="learn.js"></script>
+  <script src="scan.js"></script>
+  <script src="events.js"></script>
+  <script src="app.js"></script>
+
 </body>
 </html>
