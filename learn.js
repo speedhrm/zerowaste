@@ -628,7 +628,7 @@ const speedFlashCards = [
     id:1,
     behavior:"ล้างแก้วกาแฟก่อนแยกลงถัง",
     speed:"P",
-    title:"PROACTIVE",
+    title:"PROACTIVE APPROACH",
     icon:"⚡",
     color:"#F21643",
     explanation:"ลงมือทำก่อน ลดปัญหาขยะปนเปื้อน และช่วยให้รีไซเคิลได้ง่ายขึ้น"
@@ -673,7 +673,7 @@ const speedFlashCards = [
     id:6,
     behavior:"พกแก้วส่วนตัวแทนการรับแก้วใหม่ทุกวัน",
     speed:"P",
-    title:"PROACTIVE",
+    title:"PROACTIVE APPROACH",
     icon:"⚡",
     color:"#F21643",
     explanation:"ลดขยะตั้งแต่ต้นทางโดยไม่ต้องรอให้มีคนเตือน"
@@ -718,7 +718,7 @@ const speedFlashCards = [
     id:11,
     behavior:"แยกฝาขวดออกจากขวดก่อนทิ้ง",
     speed:"P",
-    title:"PROACTIVE",
+    title:"PROACTIVE APPROACH",
     icon:"⚡",
     color:"#F21643",
     explanation:"เตรียมขยะให้พร้อมก่อนทิ้ง ช่วยให้จัดการต่อได้ง่ายขึ้น"
@@ -727,7 +727,7 @@ const speedFlashCards = [
     id:12,
     behavior:"รายงานจุดวางถังขยะที่ไม่เหมาะสม",
     speed:"P",
-    title:"PROACTIVE",
+    title:"PROACTIVE APPROACH",
     icon:"⚡",
     color:"#F21643",
     explanation:"เห็นปัญหาแล้วรีบแจ้งเพื่อป้องกันการแยกขยะผิด"
@@ -772,7 +772,7 @@ const speedFlashCards = [
     id:17,
     behavior:"ปิดไฟและเครื่องใช้ไฟฟ้าก่อนออกจากห้อง",
     speed:"P",
-    title:"PROACTIVE",
+    title:"PROACTIVE APPROACH",
     icon:"⚡",
     color:"#F21643",
     explanation:"ลงมือช่วยประหยัดพลังงานก่อนเกิดความสูญเปล่า"
@@ -817,7 +817,7 @@ const speedFlashCards = [
     id:22,
     behavior:"ลดการรับช้อนส้อมพลาสติกเมื่อไม่จำเป็น",
     speed:"P",
-    title:"PROACTIVE",
+    title:"PROACTIVE APPROACH",
     icon:"⚡",
     color:"#F21643",
     explanation:"ลดขยะใช้ครั้งเดียวตั้งแต่ก่อนเกิดขยะ"
@@ -902,7 +902,7 @@ function renderSpeedFlashCard(){
   }
 
   if(answerTitle){
-    answerTitle.innerText = `${card.speed} = ${card.title}`;
+    answerTitle.innerText = card.title.toUpperCase();
   }
 
   if(answerDescription){
@@ -910,8 +910,20 @@ function renderSpeedFlashCard(){
   }
 
   const backCard = document.querySelector(".flash-card-back");
-  if(backCard){
-    backCard.style.background = `linear-gradient(135deg, ${card.color}, #193528)`;
+
+  if (backCard) {
+    // 1. สร้างคลังคู่สีเอาไว้
+    const colorMap = {
+      'S': '#F4C400',
+      'P': '#F51446',
+      'E': '#08AF5C', // ถ้า E มีสองสี อาจจะต้องเช็กเงื่อนไขเพิ่ม แต่อันนี้ยึดตามตัวหลังสุดนะคราับ
+      'E2': '#76329D', // สมมติว่าถ้าเป็น E อีกตัวให้ใช้ชื่ออื่น หรือถ้าเหมือนกันระบบจะทับเป็นอันล่าสุด
+      'D': '#1156A8'
+    };
+
+    // 2. ดึงสีตามตัวอักษรของ card (สมมติว่าตัวแปรชื่อ card.letter หรือ card.type นะครับ)
+    // ถ้าหาตัวอักษรไม่เจอ จะใช้สีเริ่มต้นเป็น card.color
+    backCard.style.background = colorMap[card.letter] || card.color; 
   }
 
   updateFlashNavButtons();
@@ -947,8 +959,12 @@ function nextFlashCard(){
     return;
   }
 
-  currentFlashCardIndex++;
-  renderSpeedFlashCard();
+  resetFlashFlip();
+
+  setTimeout(()=>{
+    currentFlashCardIndex++;
+    renderSpeedFlashCard();
+  }, 180);
 }
 
 function previousFlashCard(){
@@ -956,8 +972,22 @@ function previousFlashCard(){
     return;
   }
 
-  currentFlashCardIndex--;
-  renderSpeedFlashCard();
+  resetFlashFlip();
+
+  setTimeout(()=>{
+    currentFlashCardIndex--;
+    renderSpeedFlashCard();
+  }, 180);
+}
+
+function resetFlashFlip(){
+  const flashCard = document.getElementById("flashCard");
+
+  flashCardFlipped = false;
+
+  if(flashCard){
+    flashCard.classList.remove("flipped");
+  }
 }
 
 // ======================================================

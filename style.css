@@ -2488,41 +2488,57 @@ select{
 }
 
 .flash-card-front{
-  background:
-    radial-gradient(circle at top right, rgba(98,210,143,.25), transparent 32%),
-    radial-gradient(circle at bottom left, rgba(255,218,120,.22), transparent 30%),
-    linear-gradient(160deg,#ffffff,#F2FFF7);
+  background:#ffffff;
   border:2px solid #DDF5E6;
+}
+
+.flash-card-front::before{
+  content:"SPEED";
+  position:absolute;
+  top:18px;
+  right:-10px;
+  font-size:62px;
+  font-weight:900;
+  font-style:italic;
+  letter-spacing:2px;
+  color:rgba(18,129,79,.08);
+  line-height:1;
+  pointer-events:none;
 }
 
 .flash-card-back{
   transform:rotateY(180deg);
   color:white;
-  border:2px solid rgba(255,255,255,.25);
+  border:none;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
 }
 
 .flash-icon{
   width:108px;
   height:108px;
   border-radius:34px;
-  background:#E7FFF0;
+  background:#F7FBF8;
   display:flex;
   align-items:center;
   justify-content:center;
   font-size:64px;
   margin-bottom:22px;
-  box-shadow:0 16px 30px rgba(32,164,100,.12);
+  box-shadow:0 16px 30px rgba(28,80,52,.10);
 }
 
 .flash-front-label{
   display:inline-flex;
   padding:7px 12px;
   border-radius:999px;
-  background:#EAF8F0;
-  color:#168354;
+  background:#F7FBF8;
+  color:#12814F;
   font-size:12px;
   font-weight:900;
   margin-bottom:14px;
+  letter-spacing:.4px;
 }
 
 .flash-behavior{
@@ -2537,7 +2553,7 @@ select{
   font-size:15px;
   font-weight:800;
   color:#12814F;
-  background:white;
+  background:#F7FBF8;
   border:1px solid #DDF5E6;
   border-radius:18px;
   padding:11px 14px;
@@ -2564,23 +2580,25 @@ select{
 }
 
 .flash-answer-title{
-  font-size:32px;
+  font-size:42px;
   font-weight:900;
-  line-height:1.2;
-  margin-bottom:18px;
+  line-height:1;
+  letter-spacing:1px;
+  margin-bottom:20px;
   color:white;
 }
 
 .flash-answer-description{
   font-size:18px;
-  line-height:1.65;
-  color:rgba(255,255,255,.92);
+  line-height:1.7;
+  color:rgba(255,255,255,.95);
+  max-width:260px;
 }
 
 .flash-back-hint{
   margin-top:24px;
   font-size:13px;
-  color:rgba(255,255,255,.75);
+  color:rgba(255,255,255,.78);
   font-weight:700;
 }
 
