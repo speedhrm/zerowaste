@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="th">
 <head>
@@ -10,16 +11,66 @@
 </head>
 
 <body>
-  <div class="app">
 
-    <header class="header">
-      <div class="logo-wrapper">
-        <img src="images/logo.png" alt="Mascot Logo" class="brand-logo">
+    <!-- MOCK LOGIN PAGE -->
+    <section id="loginPage" class="login-page">
+      <div class="login-card">
+
+        <div class="login-logo">🌱</div>
+
+        <h1>Zero Waste</h1>
+
+        <p>
+          กรอกรหัสพนักงานเพื่อเข้าสู่ระบบ
+        </p>
+
+        <input
+          id="loginEmployeeId"
+          type="text"
+          inputmode="numeric"
+          placeholder="รหัสพนักงาน เช่น 594754"
+          maxlength="6"
+          autocomplete="off"
+        >
+
+        <button
+          id="loginButton"
+          type="button"
+          onclick="loginUser()"
+        >
+          เข้าสู่ระบบ
+        </button>
+
+        <p
+          id="loginError"
+          class="login-error hidden"
+        ></p>
+
+        <!-- กล่องแสดงผล Debug -->
+        <div
+          id="loginDebug"
+          style="
+            display: none;
+            margin-top: 16px;
+            padding: 12px;
+            border-radius: 12px;
+            background: #f1fff7;
+            color: #174c34;
+            font-size: 13px;
+            text-align: left;
+            white-space: pre-wrap;
+            word-break: break-word;
+          "
+        ></div>
+
+        <small>
+          Mock User: 594754 ถึง 594763
+        </small>
+
       </div>
-      <div class="badge">♻ Zero Waste AI</div>
-      <h1>Zero Waste</h1>
-      <p class="subtitle">App สำหรับช่วยแยกขยะสุดน่ารัก</p>
-    </header>
+    </section>
+
+<div id="appContainer" class="app hidden">
 
     <!-- HOME -->
     <main id="homePage" class="tab-page active">
@@ -27,7 +78,9 @@
       <section class="home-welcome-card home-hero-v2">
         <div>
           <p>สวัสดีครับ 👋</p>
-          <h2>คุณ XXXXX</h2>
+          <h2>
+            คุณ <span id="homeUserName">-</span>
+          </h2>
           <span>วันนี้มาช่วยโลกให้สะอาดขึ้นอีกนิดกัน</span>
         </div>
         <img src="images/logo.png" alt="Zero Waste Logo">
@@ -83,32 +136,55 @@
         </div>
       </section>
 
-      <section class="home-mission-card">
-        <div class="home-section-title">
-          <h3>Weekly Mission</h3>
-          <small>0 / 3 done</small>
-        </div>
-
-        <div class="mission-list">
-          <div class="mission-item done">
-            <span>✓</span>
-            <p>พกแก้วน้ำส่วนตัว</p>
+      <section class="mission-section">
+        <div class="mission-card personal-mission">
+          <div class="mission-top">
+            <div>
+              <p class="mission-kicker">Personal Mission</p>
+              <h3>สแกนขยะให้ครบ 2 ครั้งวันนี้</h3>
+            </div>
+            <span class="mission-points">+5 pts</span>
           </div>
 
-          <div class="mission-item">
-            <span>2</span>
-            <p>แยกขวดพลาสติก 5 ชิ้น</p>
+          <div class="mission-count">
+            <strong id="personalScanCount">0</strong>
+            <span>/ 2 ครั้ง</span>
           </div>
 
-          <div class="mission-item">
-            <span>3</span>
-            <p>เปิด Flash Card อย่างน้อย 5 ใบ</p>
+          <div class="mission-progress">
+            <div id="personalScanProgress" class="mission-progress-fill" style="width:0%"></div>
           </div>
+
+          <p id="personalMissionStatus" class="mission-status">
+            อีก 2 ครั้ง รับคะแนนวันนี้ 🌱
+          </p>
         </div>
 
-        <div class="mission-progress">
-          <div style="width:33%;"></div>
+        <div class="mission-card team-mission">
+          <div class="mission-top">
+            <div>
+              <p class="mission-kicker">Team Mission</p>
+              <h3>ทีมสแกนครบ 30 ครั้งในสัปดาห์นี้</h3>
+            </div>
+            <span class="mission-points team">+20 pts</span>
+          </div>
+
+          <div class="team-name">ทีมของคุณ: <b id="teamName">HR Strategy</b></div>
+
+          <div class="mission-count">
+            <strong id="teamScanCount">0</strong>
+            <span>/ 30 ครั้ง</span>
+          </div>
+
+          <div class="mission-progress">
+            <div id="teamScanProgress" class="mission-progress-fill team" style="width:0%"></div>
+          </div>
+
+          <p id="teamMissionStatus" class="mission-status">
+            อีก 30 ครั้ง สมาชิกทุกคนรับ +20 pts 🤝
+          </p>
         </div>
+
       </section>
 
       <section class="home-card impact-highlight-card">
@@ -586,47 +662,258 @@
 
     <!-- PROFILE -->
     <main id="profilePage" class="tab-page">
-      <section class="card profile-hero-card">
-        <div class="profile-avatar">👤</div>
-        <h2>My Profile</h2>
-        <p class="small">พื้นที่สำหรับสรุปคะแนน การเรียนรู้ ประวัติการสแกน และ Impact ส่วนบุคคล</p>
-        <div class="profile-placeholder">Coming soon: เชื่อมต่อ API และฐานข้อมูลภายใน</div>
-      </section>
-    </main>
 
-  </div>
+      <section class="profile-passport-card">
+
+        <div class="profile-top">
+          <div class="profile-avatar">🌱</div>
+
+          <div>
+            <h2>
+              คุณ <span id="profileUserName">-</span>
+            </h2>
+
+            <p id="profileUserDivision">-</p>
+
+            <span>
+              Green Level:
+              <b id="profileUserLevel">-</b>
+            </span>
+          </div>
+        </div>
+
+        <div class="profile-score-card">
+          <span>Green Score</span>
+
+          <strong id="profileUserScore">0</strong>
+
+          <small>points</small>
+        </div>
+
+        <button
+          class="green-passport-btn"
+          type="button"
+          onclick="openGreenPassport()"
+        >
+          <div class="passport-btn-icon">🌍</div>
+
+          <div>
+            <strong>My Green Passport</strong>
+
+            <span>
+              เปิด QR เพื่อให้ Admin สแกนรับคะแนนกิจกรรม
+            </span>
+          </div>
+
+          <b>เปิด QR</b>
+        </button>
+
+      </section>
+
+
+      <!-- MY IMPACT -->
+      <section class="home-card">
+
+        <div class="home-section-title">
+          <h3>My Impact</h3>
+          <small>สะสมทั้งหมด</small>
+        </div>
+
+        <div class="profile-impact-grid">
+
+          <div>
+            <strong id="profileWasteSorted">0</strong>
+            <span>Waste Sorted</span>
+          </div>
+
+          <div>
+            <strong>
+              <span id="profileCo2Reduced">0</span> kg
+            </strong>
+            <span>CO₂ Reduced</span>
+          </div>
+
+          <div>
+            <strong id="profileAiScanCount">0</strong>
+            <span>AI Scan</span>
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- RECENT POINTS -->
+      <section class="home-card">
+
+        <div class="home-section-title">
+          <h3>Recent Points</h3>
+          <small>ล่าสุด</small>
+        </div>
+
+        <div class="point-history-list">
+
+          <div class="point-history-row">
+            <div>♻️</div>
+
+            <p>
+              <strong>เข้าร่วม Zero Waste Day</strong>
+              <span>รับคะแนนจากกิจกรรม</span>
+            </p>
+
+            <b>+50</b>
+          </div>
+
+          <div class="point-history-row">
+            <div>🧠</div>
+
+            <p>
+              <strong>ทำ Mini Quiz</strong>
+              <span>ตอบคำถามครบ 10 ข้อ</span>
+            </p>
+
+            <b>+20</b>
+          </div>
+
+          <div class="point-history-row">
+            <div>🃏</div>
+
+            <p>
+              <strong>เปิด Flash Card</strong>
+              <span>เรียนรู้ SPEED x Zero Waste</span>
+            </p>
+
+            <b>+10</b>
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- GREEN PASSPORT MODAL -->
+      <div
+        id="greenPassportModal"
+        class="green-passport-modal hidden"
+      >
+
+        <div
+          class="green-passport-backdrop"
+          onclick="closeGreenPassport()"
+        ></div>
+
+        <div class="green-passport-sheet">
+
+          <button
+            class="passport-close-btn"
+            type="button"
+            onclick="closeGreenPassport()"
+            aria-label="ปิด Green Passport"
+          >
+            ×
+          </button>
+
+          <div class="passport-stamp">
+            MY GREEN PASSPORT
+          </div>
+
+          <div class="passport-avatar">🌿</div>
+
+          <h2>
+            คุณ <span id="passportUserName">-</span>
+          </h2>
+
+          <p id="passportUserDivision">-</p>
+
+          <div class="passport-score">
+            <span>Green Score</span>
+
+            <strong>
+              <span id="passportUserScore">0</span> pts
+            </strong>
+          </div>
+
+          <div
+            id="passportQRCode"
+            class="passport-qr-box"
+          ></div>
+
+          <div class="passport-helper">
+            ให้ Admin สแกน QR นี้ เพื่อสะสมคะแนนกิจกรรม
+          </div>
+
+          <div
+            id="passportUserCode"
+            class="passport-code"
+          >
+            -
+          </div>
+
+        </div>
+      </div>
+
+    </main>
 
   <!-- BOTTOM MENU -->
   <nav class="green-menu">
-    <button id="homeTabBtn" class="green-menu-btn active" onclick="showTab('home')">
+    <button
+      id="homeTabBtn"
+      class="green-menu-btn active"
+      type="button"
+      onclick="showTab('home')"
+    >
       <i data-lucide="home"></i>
       <span>Home</span>
     </button>
 
-    <button id="knowledgeTabBtn" class="green-menu-btn" onclick="showTab('learn')">
+    <button
+      id="knowledgeTabBtn"
+      class="green-menu-btn"
+      type="button"
+      onclick="showTab('learn')"
+    >
       <i data-lucide="book-open"></i>
       <span>Knowledge Hub</span>
     </button>
 
     <div class="scan-menu-wrap">
-      <button id="scanTabBtn" class="green-menu-scan" onclick="showTab('ai')">
+      <button
+        id="scanTabBtn"
+        class="green-menu-scan"
+        type="button"
+        onclick="showTab('ai')"
+      >
         <i data-lucide="scan-line"></i>
       </button>
+
       <span class="scan-menu-label">AI Scan</span>
     </div>
 
-    <button id="eventTabBtn" class="green-menu-btn" onclick="showTab('events')">
+    <button
+      id="eventTabBtn"
+      class="green-menu-btn"
+      type="button"
+      onclick="showTab('events')"
+    >
       <i data-lucide="calendar-days"></i>
       <span>Events</span>
     </button>
 
-    <button id="profileTabBtn" class="green-menu-btn" onclick="showTab('profile')">
+    <button
+      id="profileTabBtn"
+      class="green-menu-btn"
+      type="button"
+      onclick="showTab('profile')"
+    >
       <i data-lucide="user"></i>
       <span>Profile</span>
     </button>
   </nav>
 
+  </div>
+
   <script src="https://unpkg.com/lucide@latest"></script>
+
   <script src="config.js"></script>
   <script src="data.js"></script>
   <script src="user.js"></script>
@@ -634,7 +921,9 @@
   <script src="learn.js"></script>
   <script src="scan.js"></script>
   <script src="events.js"></script>
+
   <script src="app.js"></script>
 
 </body>
 </html>
+ 

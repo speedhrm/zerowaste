@@ -1,0 +1,1135 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>Zero Waste Admin</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    :root {
+      --green-900: #123c2a;
+      --green-800: #126c45;
+      --green-700: #12814f;
+      --green-600: #168354;
+      --green-500: #20a464;
+      --green-300: #8de0b2;
+      --green-100: #e7fff0;
+      --green-050: #f5fcf8;
+
+      --text-main: #193528;
+      --text-soft: #6c7f72;
+      --border: #dcece2;
+      --white: #ffffff;
+      --danger: #c0392b;
+      --danger-bg: #ffe7e7;
+      --info: #1767a6;
+      --info-bg: #eaf4ff;
+    }
+
+    html {
+      min-height: 100%;
+    }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+
+      font-family:
+        "IBM Plex Sans Thai",
+        "Noto Sans Thai",
+        Tahoma,
+        Arial,
+        sans-serif;
+
+      color: var(--text-main);
+
+      background:
+        radial-gradient(
+          circle at top left,
+          rgba(86, 228, 143, 0.24),
+          transparent 26%
+        ),
+        radial-gradient(
+          circle at bottom right,
+          rgba(255, 218, 120, 0.2),
+          transparent 30%
+        ),
+        linear-gradient(
+          160deg,
+          #f0fff6 0%,
+          #fffcef 100%
+        );
+
+      background-attachment: fixed;
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+      font: inherit;
+    }
+
+    button {
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* =========================
+       Main Layout
+    ========================= */
+
+    .admin-app {
+      width: 100%;
+      max-width: 520px;
+      min-height: 100vh;
+      margin: 0 auto;
+      padding: 20px 16px 70px;
+    }
+
+    /* =========================
+       Header
+    ========================= */
+
+    .admin-header {
+      position: relative;
+      overflow: hidden;
+
+      margin-bottom: 18px;
+      padding: 26px 20px;
+
+      border-radius: 30px;
+
+      color: var(--white);
+
+      background:
+        radial-gradient(
+          circle at top right,
+          rgba(141, 224, 178, 0.28),
+          transparent 35%
+        ),
+        linear-gradient(
+          145deg,
+          var(--green-700),
+          var(--green-900)
+        );
+
+      box-shadow:
+        0 20px 45px rgba(18, 108, 69, 0.22);
+    }
+
+    .admin-header::after {
+      content: "♻";
+      position: absolute;
+      top: -18px;
+      right: 12px;
+
+      color: rgba(255, 255, 255, 0.08);
+      font-size: 120px;
+      line-height: 1;
+      pointer-events: none;
+    }
+
+    .admin-header-content {
+      position: relative;
+      z-index: 1;
+    }
+
+    .admin-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+
+      padding: 7px 12px;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 999px;
+
+      background: rgba(255, 255, 255, 0.12);
+
+      color: #b9f6d1;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.6px;
+    }
+
+    .admin-header h1 {
+      margin: 14px 0 5px;
+
+      color: var(--white);
+      font-size: 30px;
+      line-height: 1.2;
+    }
+
+    .admin-header p {
+      max-width: 350px;
+      margin: 0;
+
+      color: rgba(255, 255, 255, 0.82);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    /* =========================
+       Progress Steps
+    ========================= */
+
+    .admin-progress {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 7px;
+
+      margin: 0 0 16px;
+      padding: 8px;
+
+      border: 1px solid var(--border);
+      border-radius: 20px;
+
+      background: rgba(255, 255, 255, 0.78);
+      backdrop-filter: blur(12px);
+    }
+
+    .progress-item {
+      min-width: 0;
+      padding: 9px 4px;
+      border-radius: 14px;
+
+      color: #82948a;
+      text-align: center;
+    }
+
+    .progress-item.active {
+      background: var(--green-100);
+      color: var(--green-700);
+    }
+
+    .progress-number {
+      width: 25px;
+      height: 25px;
+      margin: 0 auto 4px;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      border-radius: 50%;
+
+      background: #edf4ef;
+
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .progress-item.active .progress-number {
+      background: var(--green-600);
+      color: var(--white);
+    }
+
+    .progress-label {
+      display: block;
+
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+
+      font-size: 10px;
+      font-weight: 700;
+    }
+
+    /* =========================
+       Cards
+    ========================= */
+
+    .admin-card {
+      margin-bottom: 16px;
+      padding: 19px;
+
+      border: 1px solid rgba(220, 236, 226, 0.9);
+      border-radius: 28px;
+
+      background: rgba(255, 255, 255, 0.94);
+      backdrop-filter: blur(12px);
+
+      box-shadow:
+        0 15px 34px rgba(28, 80, 52, 0.09);
+    }
+
+    .card-heading {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+
+      margin-bottom: 16px;
+    }
+
+    .step-icon {
+      width: 44px;
+      height: 44px;
+      flex-shrink: 0;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      border-radius: 16px;
+
+      background: var(--green-100);
+
+      font-size: 22px;
+    }
+
+    .card-heading-text {
+      min-width: 0;
+    }
+
+    .card-heading h2 {
+      margin: 0 0 3px;
+
+      color: var(--green-700);
+      font-size: 19px;
+      line-height: 1.3;
+    }
+
+    .card-heading p {
+      margin: 0;
+
+      color: var(--text-soft);
+      font-size: 12.5px;
+      line-height: 1.45;
+    }
+
+    /* =========================
+       Forms
+    ========================= */
+
+    .admin-label {
+      display: block;
+      margin: 14px 0 7px;
+
+      color: var(--text-main);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .required {
+      color: #d0463b;
+    }
+
+    .admin-select,
+    .admin-input,
+    .admin-textarea {
+      width: 100%;
+
+      padding: 13px 14px;
+
+      border: 1px solid #cfe4d8;
+      border-radius: 15px;
+
+      background: #f9fffb;
+      color: var(--text-main);
+
+      font-size: 15px;
+      outline: none;
+
+      transition:
+        border-color 0.18s ease,
+        box-shadow 0.18s ease;
+    }
+
+    .admin-select:focus,
+    .admin-input:focus,
+    .admin-textarea:focus {
+      border-color: var(--green-500);
+
+      box-shadow:
+        0 0 0 4px rgba(32, 164, 100, 0.1);
+    }
+
+    .admin-textarea {
+      min-height: 88px;
+      resize: vertical;
+    }
+
+    .admin-form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 11px;
+    }
+
+    .input-with-unit {
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+
+      border: 1px solid #cfe4d8;
+      border-radius: 15px;
+
+      background: #f9fffb;
+
+      transition:
+        border-color 0.18s ease,
+        box-shadow 0.18s ease;
+    }
+
+    .input-with-unit:focus-within {
+      border-color: var(--green-500);
+
+      box-shadow:
+        0 0 0 4px rgba(32, 164, 100, 0.1);
+    }
+
+    .input-with-unit input {
+      width: 100%;
+      min-width: 0;
+      padding: 13px 14px;
+
+      border: 0;
+      background: transparent;
+      color: var(--text-main);
+
+      outline: none;
+    }
+
+    .input-unit {
+      padding: 0 13px;
+
+      color: var(--text-soft);
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    /* =========================
+       Event Detail
+    ========================= */
+
+    .event-detail {
+      position: relative;
+
+      margin-top: 13px;
+      padding: 15px;
+
+      border: 1px solid #e1f0e7;
+      border-radius: 19px;
+
+      background:
+        linear-gradient(
+          145deg,
+          #f2fff7,
+          #ffffff
+        );
+
+      color: #52665b;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .event-detail strong {
+      display: block;
+      margin-bottom: 6px;
+
+      color: var(--green-700);
+      font-size: 17px;
+    }
+
+    .event-detail span {
+      display: block;
+      margin-top: 3px;
+    }
+
+    .event-status {
+      display: inline-flex !important;
+      width: max-content;
+
+      margin-top: 9px !important;
+      padding: 5px 10px;
+
+      border-radius: 999px;
+
+      background: var(--green-100);
+      color: var(--green-600);
+
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    /* =========================
+       Scanner
+    ========================= */
+
+    .scanner-shell {
+      position: relative;
+      min-height: 270px;
+
+      overflow: hidden;
+
+      border: 2px dashed #94dcb2;
+      border-radius: 24px;
+
+      background:
+        linear-gradient(
+          145deg,
+          #f2fff7,
+          #f9fffb
+        );
+    }
+
+    #qrReader {
+      width: 100%;
+      overflow: hidden;
+      border-radius: 22px;
+    }
+
+    #qrReader video {
+      width: 100% !important;
+      border-radius: 20px;
+    }
+
+    .scanner-placeholder {
+      min-height: 270px;
+
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+
+      padding: 26px;
+
+      color: var(--text-soft);
+      text-align: center;
+    }
+
+    .scanner-visual {
+      width: 82px;
+      height: 82px;
+      margin-bottom: 13px;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      border: 1px solid #dceee4;
+      border-radius: 26px;
+
+      background: var(--white);
+
+      font-size: 40px;
+
+      box-shadow:
+        0 12px 25px rgba(28, 80, 52, 0.09);
+    }
+
+    .scanner-placeholder strong {
+      display: block;
+      margin-bottom: 4px;
+
+      color: var(--green-700);
+      font-size: 16px;
+    }
+
+    .scanner-placeholder span {
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    /* =========================
+       Buttons
+    ========================= */
+
+    .admin-button {
+      width: 100%;
+      margin-top: 13px;
+      padding: 14px 16px;
+
+      border: 0;
+      border-radius: 16px;
+
+      background:
+        linear-gradient(
+          135deg,
+          var(--green-500),
+          var(--green-700)
+        );
+
+      color: var(--white);
+
+      font-size: 15px;
+      font-weight: 800;
+      cursor: pointer;
+
+      box-shadow:
+        0 12px 24px rgba(32, 164, 100, 0.2);
+
+      transition:
+        transform 0.15s ease,
+        opacity 0.15s ease;
+    }
+
+    .admin-button:active {
+      transform: scale(0.98);
+    }
+
+    .admin-button.secondary {
+      background: var(--green-100);
+      color: var(--green-600);
+      box-shadow: none;
+    }
+
+    .admin-button.danger {
+      background: var(--danger-bg);
+      color: var(--danger);
+      box-shadow: none;
+    }
+
+    .admin-button:disabled {
+      opacity: 0.48;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    .button-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    /* =========================
+       User Result
+    ========================= */
+
+    .user-result {
+      position: relative;
+
+      overflow: hidden;
+
+      padding: 20px 16px;
+
+      border: 1px solid #dceee4;
+      border-radius: 23px;
+
+      background:
+        radial-gradient(
+          circle at top right,
+          rgba(86, 228, 143, 0.23),
+          transparent 32%
+        ),
+        linear-gradient(
+          145deg,
+          #f2fff7,
+          #ffffff
+        );
+
+      text-align: center;
+    }
+
+    .user-avatar {
+      width: 74px;
+      height: 74px;
+      margin: 0 auto 11px;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      border-radius: 25px;
+
+      background:
+        linear-gradient(
+          145deg,
+          var(--green-500),
+          var(--green-700)
+        );
+
+      color: var(--white);
+      font-size: 38px;
+
+      box-shadow:
+        0 13px 25px rgba(18, 108, 69, 0.19);
+    }
+
+    .user-result h3 {
+      margin: 0 0 9px;
+
+      color: var(--green-700);
+      font-size: 21px;
+      line-height: 1.3;
+    }
+
+    .user-meta {
+      display: grid;
+      gap: 7px;
+
+      margin-top: 13px;
+    }
+
+    .user-meta-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+
+      padding: 9px 11px;
+
+      border-radius: 13px;
+
+      background: rgba(255, 255, 255, 0.82);
+
+      color: var(--text-soft);
+      font-size: 12.5px;
+      text-align: left;
+    }
+
+    .user-meta-row strong {
+      color: var(--text-main);
+      text-align: right;
+    }
+
+    .score-highlight {
+      color: var(--green-600) !important;
+      font-size: 17px;
+    }
+
+    /* =========================
+       Messages
+    ========================= */
+
+    .system-message {
+      margin-top: 13px;
+      padding: 13px;
+
+      border-radius: 15px;
+
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 1.5;
+      text-align: center;
+    }
+
+    .system-message.success {
+      background: var(--green-100);
+      color: var(--green-600);
+    }
+
+    .system-message.error {
+      background: var(--danger-bg);
+      color: var(--danger);
+    }
+
+    .system-message.info {
+      background: var(--info-bg);
+      color: var(--info);
+    }
+
+    /* =========================
+       Responsive
+    ========================= */
+
+    @media (max-width: 390px) {
+      .admin-form-grid,
+      .button-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .admin-app {
+        padding-left: 12px;
+        padding-right: 12px;
+      }
+
+      .admin-header {
+        padding: 24px 18px;
+      }
+
+      .admin-header h1 {
+        font-size: 27px;
+      }
+
+      .progress-label {
+        font-size: 9px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <main class="admin-app">
+
+    <!-- HEADER -->
+    <header class="admin-header">
+      <div class="admin-header-content">
+
+        <div class="admin-badge">
+          🛡️ ZERO WASTE ADMIN
+        </div>
+
+        <h1>Event Check-in</h1>
+
+        <p>
+          สแกน Green Passport และบันทึกข้อมูลกิจกรรม
+        </p>
+
+      </div>
+    </header>
+
+
+    <!-- PROGRESS -->
+    <div class="admin-progress">
+
+      <div
+        id="progressEvent"
+        class="progress-item active"
+      >
+        <div class="progress-number">1</div>
+        <span class="progress-label">กิจกรรม</span>
+      </div>
+
+      <div
+        id="progressScan"
+        class="progress-item"
+      >
+        <div class="progress-number">2</div>
+        <span class="progress-label">สแกน QR</span>
+      </div>
+
+      <div
+        id="progressUser"
+        class="progress-item"
+      >
+        <div class="progress-number">3</div>
+        <span class="progress-label">ผู้เข้าร่วม</span>
+      </div>
+
+      <div
+        id="progressTransaction"
+        class="progress-item"
+      >
+        <div class="progress-number">4</div>
+        <span class="progress-label">บันทึก</span>
+      </div>
+
+    </div>
+
+
+    <!-- STEP 1 -->
+    <section class="admin-card">
+
+      <div class="card-heading">
+        <div class="step-icon">📅</div>
+
+        <div class="card-heading-text">
+          <h2>เลือกกิจกรรม</h2>
+
+          <p>
+            แสดงเฉพาะกิจกรรม Upcoming และ Future
+          </p>
+        </div>
+      </div>
+
+      <label
+        for="eventSelect"
+        class="admin-label"
+      >
+        กิจกรรม <span class="required">*</span>
+      </label>
+
+      <select
+        id="eventSelect"
+        class="admin-select"
+      >
+        <option value="">
+          กำลังโหลดกิจกรรม...
+        </option>
+      </select>
+
+      <div
+        id="eventDetail"
+        class="event-detail"
+      >
+        เลือกกิจกรรมเพื่อดูรายละเอียด
+      </div>
+
+    </section>
+
+
+    <!-- STEP 2 -->
+    <section class="admin-card">
+
+      <div class="card-heading">
+        <div class="step-icon">📷</div>
+
+        <div class="card-heading-text">
+          <h2>สแกน Green Passport</h2>
+
+          <p>
+            เปิดกล้องแล้วนำ QR Code ให้อยู่ในกรอบ
+          </p>
+        </div>
+      </div>
+
+      <div class="scanner-shell">
+
+        <div id="qrReader"></div>
+
+        <div
+          id="scannerPlaceholder"
+          class="scanner-placeholder"
+        >
+          <div class="scanner-visual">▣</div>
+
+          <strong>ยังไม่เปิดกล้อง</strong>
+
+          <span>
+            กรุณาเลือกกิจกรรมก่อนเปิดกล้องสแกน QR
+          </span>
+        </div>
+
+      </div>
+
+      <button
+        id="startScannerButton"
+        class="admin-button"
+        type="button"
+        disabled
+      >
+        เปิดกล้องสแกน QR
+      </button>
+
+      <button
+        id="stopScannerButton"
+        class="admin-button secondary hidden"
+        type="button"
+      >
+        ปิดกล้อง
+      </button>
+
+      <div
+        id="systemMessage"
+        class="system-message hidden"
+      ></div>
+
+    </section>
+
+
+    <!-- STEP 3 -->
+    <section
+      id="userResultCard"
+      class="admin-card hidden"
+    >
+
+      <div class="card-heading">
+        <div class="step-icon">👤</div>
+
+        <div class="card-heading-text">
+          <h2>ข้อมูลผู้เข้าร่วม</h2>
+
+          <p>
+            ตรวจสอบข้อมูลเจ้าของ Green Passport
+          </p>
+        </div>
+      </div>
+
+      <div class="user-result">
+
+        <div class="user-avatar">🌱</div>
+
+        <h3 id="scannedUserName">-</h3>
+
+        <div class="user-meta">
+
+          <div class="user-meta-row">
+            <span>รหัสพนักงาน</span>
+            <strong id="scannedEmployeeId">-</strong>
+          </div>
+
+          <div class="user-meta-row">
+            <span>หน่วยงาน</span>
+            <strong id="scannedDivision">-</strong>
+          </div>
+
+          <div class="user-meta-row">
+            <span>Green Score</span>
+
+            <strong
+              id="scannedGreenScore"
+              class="score-highlight"
+            >
+              0
+            </strong>
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- STEP 4 -->
+    <section
+      id="transactionCard"
+      class="admin-card hidden"
+    >
+
+      <div class="card-heading">
+        <div class="step-icon">📝</div>
+
+        <div class="card-heading-text">
+          <h2>บันทึกรายการ</h2>
+
+          <p>
+            กรอกข้อมูลที่เกี่ยวข้องและเพิ่มคะแนน
+          </p>
+        </div>
+      </div>
+
+      <label
+        for="wasteType"
+        class="admin-label"
+      >
+        ประเภทวัสดุ
+      </label>
+
+      <select
+        id="wasteType"
+        class="admin-select"
+      >
+        <option value="">เลือกประเภทวัสดุ</option>
+        <option value="paper">กระดาษ</option>
+        <option value="plastic">พลาสติก</option>
+        <option value="metal">โลหะ / กระป๋อง</option>
+        <option value="glass">แก้ว</option>
+        <option value="usedOil">น้ำมันใช้แล้ว</option>
+        <option value="energyWaste">ขยะพลังงาน</option>
+        <option value="electronic">ขยะอิเล็กทรอนิกส์</option>
+        <option value="other">อื่น ๆ</option>
+      </select>
+
+
+      <div class="admin-form-grid">
+
+        <div>
+          <label
+            for="weightKg"
+            class="admin-label"
+          >
+            น้ำหนัก
+          </label>
+
+          <div class="input-with-unit">
+            <input
+              id="weightKg"
+              type="number"
+              min="0"
+              step="0.01"
+              placeholder="0.00"
+            >
+
+            <span class="input-unit">kg</span>
+          </div>
+        </div>
+
+
+        <div>
+          <label
+            for="amountBaht"
+            class="admin-label"
+          >
+            เงินที่ได้รับ
+          </label>
+
+          <div class="input-with-unit">
+            <input
+              id="amountBaht"
+              type="number"
+              min="0"
+              step="0.01"
+              placeholder="0.00"
+            >
+
+            <span class="input-unit">บาท</span>
+          </div>
+        </div>
+
+      </div>
+
+
+      <label
+        for="checkinPoints"
+        class="admin-label"
+      >
+        คะแนนที่ได้รับ
+        <span class="required">*</span>
+      </label>
+
+      <div class="input-with-unit">
+        <input
+          id="checkinPoints"
+          type="number"
+          min="0"
+          step="1"
+          placeholder="0"
+        >
+
+        <span class="input-unit">points</span>
+      </div>
+
+
+      <label
+        for="transactionNote"
+        class="admin-label"
+      >
+        หมายเหตุ
+      </label>
+
+      <textarea
+        id="transactionNote"
+        class="admin-textarea"
+        rows="3"
+        placeholder="รายละเอียดเพิ่มเติม ถ้ามี"
+      ></textarea>
+
+
+      <button
+        id="confirmTransactionButton"
+        class="admin-button"
+        type="button"
+      >
+        ยืนยันและเพิ่มคะแนน
+      </button>
+
+      <button
+        id="resetTransactionButton"
+        class="admin-button secondary"
+        type="button"
+      >
+        ล้างข้อมูลและสแกนใหม่
+      </button>
+
+      <div
+        id="transactionMessage"
+        class="system-message hidden"
+      ></div>
+
+    </section>
+
+  </main>
+
+  <!-- API Configuration -->
+  <script src="config.js"></script>
+
+  <!-- Admin Logic -->
+  <script src="admin.js"></script>
+
+</body>
+</html>

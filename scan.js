@@ -501,6 +501,8 @@ function showGuide(result){
   renderSpeedMessage();
 
   document.getElementById("guideCard").classList.remove("hidden");
+
+  addScanMissionCount();
 }
   
 // ======================================================

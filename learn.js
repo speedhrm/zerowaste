@@ -1,3 +1,426 @@
+
+// ======================================================
+// LEARNING HIGH SCORE REWARD
+// เล่นซ้ำได้ไม่จำกัด เก็บคะแนนสูงสุดของแต่ละกิจกรรม
+// Green Score เพิ่มเฉพาะส่วนต่างจากคะแนนสูงสุดเดิม
+// ======================================================
+
+let learningScoreSubmitting = false;
+
+async function submitLearningScore(moduleName, score) {
+  const localBestScore = saveLocalLearningHistory(moduleName, score);
+  renderLearningHistory(moduleName, { localOnly: true });
+  if (learningScoreSubmitting) {
+    return {
+      success: false,
+      message: "ระบบกำลังบันทึกคะแนน กรุณารอสักครู่"
+    };
+  }
+
+  if (typeof loggedInUser === "undefined" || !loggedInUser) {
+    return {
+      success: false,
+      message: "กรุณาเข้าสู่ระบบก่อนบันทึกคะแนน"
+    };
+  }
+
+  const qrToken = String(loggedInUser.qrToken || "").trim();
+
+  if (!qrToken) {
+    return {
+      success: false,
+      message: "ไม่พบ QR Token ของผู้ใช้"
+    };
+  }
+
+  if (typeof USER_API_URL === "undefined" || !USER_API_URL) {
+    return {
+      success: false,
+      message: "ไม่พบ USER_API_URL ใน config.js"
+    };
+  }
+
+  const normalizedScore = Math.max(
+    0,
+    Math.min(100, Number(score) || 0)
+  );
+
+  const payload = {
+    action: "saveLearningScore",
+    qrToken,
+    moduleName,
+    score: normalizedScore
+  };
+
+  learningScoreSubmitting = true;
+
+  try {
+    console.log("Learning Score Payload:", payload);
+
+    const response = await fetch(USER_API_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "text/plain;charset=utf-8"
+      },
+      body: JSON.stringify(payload)
+    });
+
+    const rawText = await response.text();
+    console.log("Learning Score Response:", rawText);
+
+    if (!response.ok) {
+      throw new Error(`User API ตอบกลับ HTTP ${response.status}`);
+    }
+
+    let result;
+
+    try {
+      result = JSON.parse(rawText);
+    } catch (parseError) {
+      throw new Error("User API ไม่ได้ส่งผลคะแนนกลับมาเป็น JSON");
+    }
+
+    if (!result.success) {
+      return {
+        ...result,
+        localSaved: true,
+        localBestScore
+      };
+    }
+
+    learningScoreHistory[moduleName] = normalizeLearningScore(result.bestScore);
+    saveLocalLearningHistory(moduleName, result.bestScore);
+    renderLearningHistory(moduleName);
+
+    loggedInUser.greenScore = Number(result.newGreenScore) || 0;
+
+    sessionStorage.setItem(
+      "zeroWasteLoggedInUser",
+      JSON.stringify(loggedInUser)
+    );
+
+    if (typeof renderLoggedInUser === "function") {
+      renderLoggedInUser();
+    }
+
+    if (typeof markModuleCompleted === "function") {
+      markModuleCompleted(moduleName);
+    }
+
+    return result;
+
+  } catch (error) {
+    console.error("Submit Learning Score Error:", error);
+
+    return {
+      success: false,
+      localSaved: true,
+      localBestScore,
+      message: "บันทึกคะแนนสูงสุดบนอุปกรณ์นี้แล้ว ส่วน Green Point จะซิงก์หลังเชื่อมระบบ"
+    };
+
+  } finally {
+    learningScoreSubmitting = false;
+  }
+}
+
+function showLearningRewardMessage(pageId, messageId, result) {
+  const page = document.getElementById(pageId);
+
+  if (!page) {
+    return;
+  }
+
+  let messageBox = document.getElementById(messageId);
+
+  if (!messageBox) {
+    messageBox = document.createElement("div");
+    messageBox.id = messageId;
+
+    const scoreCard = page.querySelector(".final-score-card");
+
+    if (scoreCard) {
+      scoreCard.insertAdjacentElement("afterend", messageBox);
+    } else {
+      page.appendChild(messageBox);
+    }
+  }
+
+  if (result && result.success) {
+    messageBox.className = "learning-reward-message success";
+
+    const submittedScore = Number(result.submittedScore) || 0;
+    const bestScore = Number(result.bestScore) || 0;
+    const pointsAdded = Number(result.pointsAdded) || 0;
+
+    messageBox.textContent = pointsAdded > 0
+      ? `คะแนนสูงสุดใหม่ ${bestScore}/100 รับ Green Point เพิ่ม +${pointsAdded} คะแนน 🎉`
+      : `คะแนนรอบนี้ ${submittedScore}/100 คะแนนสูงสุดเดิม ${bestScore}/100`;
+
+    return;
+  }
+
+  if (result?.localSaved) {
+    messageBox.className = "learning-reward-message pending";
+    messageBox.textContent = result.message;
+    return;
+  }
+
+  messageBox.className = "learning-reward-message error";
+  messageBox.textContent = result?.message || "บันทึกคะแนนไม่สำเร็จ";
+}
+
+function clearLearningRewardMessage(messageId) {
+  const messageBox = document.getElementById(messageId);
+
+  if (messageBox) {
+    messageBox.remove();
+  }
+}
+
+
+// ======================================================
+// LEARNING HISTORY UI
+// แสดงด้านบนของหน้าเกม และใช้ Local Storage เป็นข้อมูลสำรอง
+// ระหว่างรอเชื่อม getLearningScores ใน Apps Script
+// ======================================================
+
+const LEARNING_HISTORY_STORAGE_KEY = "zeroWasteLearningBestScores";
+
+let learningScoreHistory = loadLocalLearningHistory();
+let learningHistoryLoading = false;
+
+const learningHistoryConfig = {
+  matchGame: {
+    pageId: "matchGamePage",
+    title: "Match the Bin"
+  },
+  miniQuiz: {
+    pageId: "miniQuizPage",
+    title: "Mini Quiz"
+  },
+  speedFlashCard: {
+    pageId: "speedFlashCardPage",
+    title: "SPEED Flash Card"
+  }
+};
+
+function normalizeLearningScore(value) {
+  return Math.max(0, Math.min(100, Number(value) || 0));
+}
+
+function loadLocalLearningHistory() {
+  try {
+    const saved = JSON.parse(
+      localStorage.getItem(LEARNING_HISTORY_STORAGE_KEY) || "{}"
+    );
+
+    return {
+      matchGame: normalizeLearningScore(saved.matchGame),
+      miniQuiz: normalizeLearningScore(saved.miniQuiz),
+      speedFlashCard: normalizeLearningScore(saved.speedFlashCard)
+    };
+  } catch (error) {
+    return {
+      matchGame: 0,
+      miniQuiz: 0,
+      speedFlashCard: 0
+    };
+  }
+}
+
+function saveLocalLearningHistory(moduleName, score) {
+  const previousScore = normalizeLearningScore(learningScoreHistory[moduleName]);
+  const bestScore = Math.max(previousScore, normalizeLearningScore(score));
+
+  learningScoreHistory[moduleName] = bestScore;
+
+  localStorage.setItem(
+    LEARNING_HISTORY_STORAGE_KEY,
+    JSON.stringify(learningScoreHistory)
+  );
+
+  return bestScore;
+}
+
+function ensureLearningHistoryCard(moduleName) {
+  const config = learningHistoryConfig[moduleName];
+
+  if (!config) {
+    return null;
+  }
+
+  const page = document.getElementById(config.pageId);
+
+  if (!page) {
+    return null;
+  }
+
+  const cardId = `${moduleName}HistoryCard`;
+  let card = document.getElementById(cardId);
+
+  if (card) {
+    return card;
+  }
+
+  const header = page.querySelector(".game-page-header");
+
+  if (!header) {
+    return null;
+  }
+
+  card = document.createElement("section");
+  card.id = cardId;
+  card.className = "learning-history-card";
+  card.innerHTML = `
+    <div class="learning-history-head">
+      <div>
+        <span class="learning-history-kicker">YOUR BEST</span>
+        <strong data-history-best>0 / 100</strong>
+      </div>
+
+      <div class="learning-point-badge">
+        <span class="learning-point-icon">🌱</span>
+        <div>
+          <small>Green Point ที่เก็บแล้ว</small>
+          <strong data-history-earned>0 points</strong>
+        </div>
+      </div>
+    </div>
+
+    <div class="learning-history-bar" aria-hidden="true">
+      <div class="learning-history-fill" data-history-fill></div>
+    </div>
+
+    <div class="learning-history-foot">
+      <span data-history-text>ยังไม่เคยทำกิจกรรมนี้</span>
+      <b data-history-remaining>เหลือ 100 points</b>
+    </div>
+  `;
+
+  header.insertAdjacentElement("afterend", card);
+  return card;
+}
+
+function ensureAllLearningHistoryCards() {
+  Object.keys(learningHistoryConfig).forEach(ensureLearningHistoryCard);
+}
+
+function renderLearningHistory(moduleName, options = {}) {
+  const card = ensureLearningHistoryCard(moduleName);
+
+  if (!card) {
+    return;
+  }
+
+  const bestScore = normalizeLearningScore(learningScoreHistory[moduleName]);
+  const remaining = Math.max(0, 100 - bestScore);
+  const bestElement = card.querySelector("[data-history-best]");
+  const earnedElement = card.querySelector("[data-history-earned]");
+  const fillElement = card.querySelector("[data-history-fill]");
+  const textElement = card.querySelector("[data-history-text]");
+  const remainingElement = card.querySelector("[data-history-remaining]");
+
+  if (bestElement) {
+    bestElement.textContent = `${bestScore} / 100`;
+  }
+
+  if (earnedElement) {
+    earnedElement.textContent = `${bestScore} points`;
+  }
+
+  if (fillElement) {
+    fillElement.style.width = `${bestScore}%`;
+  }
+
+  card.classList.toggle("is-complete", bestScore >= 100);
+  card.classList.toggle("is-loading", Boolean(options.loading));
+  card.classList.toggle("is-local", Boolean(options.localOnly));
+
+  if (textElement) {
+    if (options.loading) {
+      textElement.textContent = "กำลังตรวจสอบคะแนนสะสม...";
+    } else if (options.localOnly) {
+      textElement.textContent = "แสดงคะแนนสูงสุดบนอุปกรณ์นี้ชั่วคราว";
+    } else if (bestScore >= 100) {
+      textElement.textContent = "เก็บคะแนนจากกิจกรรมนี้ครบแล้ว เล่นซ้ำได้เพื่อทบทวน";
+    } else if (bestScore > 0) {
+      textElement.textContent = `คะแนนสูงสุดเดิม ${bestScore}/100`;
+    } else {
+      textElement.textContent = "ยังไม่เคยเก็บคะแนนจากกิจกรรมนี้";
+    }
+  }
+
+  if (remainingElement) {
+    remainingElement.textContent = bestScore >= 100
+      ? "ครบ 100 points"
+      : `เหลือ ${remaining} points`;
+  }
+}
+
+function renderAllLearningHistory(options = {}) {
+  ensureAllLearningHistoryCards();
+
+  Object.keys(learningHistoryConfig).forEach(function (moduleName) {
+    renderLearningHistory(moduleName, options);
+  });
+}
+
+async function loadLearningScoreHistory() {
+  renderAllLearningHistory({ loading: true });
+
+  if (learningHistoryLoading) {
+    return;
+  }
+
+  if (
+    typeof loggedInUser === "undefined" ||
+    !loggedInUser ||
+    !loggedInUser.qrToken ||
+    typeof USER_API_URL === "undefined" ||
+    !USER_API_URL
+  ) {
+    renderAllLearningHistory({ localOnly: true });
+    return;
+  }
+
+  learningHistoryLoading = true;
+
+  try {
+    const requestUrl =
+      `${USER_API_URL}?action=getLearningScores` +
+      `&token=${encodeURIComponent(loggedInUser.qrToken)}`;
+
+    const response = await fetch(requestUrl);
+    const rawText = await response.text();
+    const result = JSON.parse(rawText);
+
+    if (!response.ok || !result.success) {
+      throw new Error(result.message || "ยังไม่สามารถโหลดคะแนนจากระบบได้");
+    }
+
+    learningScoreHistory = {
+      matchGame: normalizeLearningScore(result.scores?.matchGame),
+      miniQuiz: normalizeLearningScore(result.scores?.miniQuiz),
+      speedFlashCard: normalizeLearningScore(result.scores?.speedFlashCard)
+    };
+
+    localStorage.setItem(
+      LEARNING_HISTORY_STORAGE_KEY,
+      JSON.stringify(learningScoreHistory)
+    );
+
+    renderAllLearningHistory();
+
+  } catch (error) {
+    console.warn("Learning History ใช้ข้อมูลบนอุปกรณ์ชั่วคราว:", error.message);
+    renderAllLearningHistory({ localOnly: true });
+
+  } finally {
+    learningHistoryLoading = false;
+  }
+}
+
 // =========================
 // MATCH GAME FULL FUNCTION
 // =========================
@@ -66,6 +489,8 @@ function shuffleArray(array){
 
 
 function openMatchGamePage(){
+  loadLearningScoreHistory();
+  clearLearningRewardMessage("matchRewardMessage");
   document.getElementById("learnMenuView")?.classList.add("hidden");
   document.getElementById("matchResultPage")?.classList.add("hidden");
   document.getElementById("matchGamePage")?.classList.remove("hidden");
@@ -90,6 +515,7 @@ function backToLearnMenu(){
 }
 
 function restartMatchGame(){
+  clearLearningRewardMessage("matchRewardMessage");
   document.getElementById("matchResultPage")?.classList.add("hidden");
   document.getElementById("matchGamePage")?.classList.remove("hidden");
   document.getElementById("learnMenuView")?.classList.add("hidden");
@@ -210,7 +636,7 @@ function getGameDifficultyPool(){
     return matchGameItems.filter(item => item.difficulty === "easy");
   }
 
-  if(gameScore < 120){
+  if(gameScore < 75){
     return matchGameItems.filter(item => item.difficulty !== "hard");
   }
 
@@ -244,16 +670,13 @@ function answerGame(selected){
   }
 
   const feedback = document.getElementById("gameFeedback");
-
   feedback.classList.remove("hidden");
 
   if(selected === currentGameItem.answer){
     gameCombo++;
 
-    const comboBonus = gameCombo >= 3 ? 5 : 0;
-    const point = 10 + comboBonus;
-
-    gameScore += point;
+    const point = 5;
+    gameScore = Math.min(100, gameScore + point);
 
     feedback.className = "game-feedback correct";
     feedback.innerHTML = `
@@ -263,11 +686,10 @@ function answerGame(selected){
     `;
   }else{
     gameCombo = 0;
-    gameScore = Math.max(0, gameScore - 3);
 
     feedback.className = "game-feedback wrong";
     feedback.innerHTML = `
-      ยังไม่ถูกน้า -3
+      ยังไม่ถูกน้า
       <br>
       <small>${currentGameItem.tip}</small>
     `;
@@ -284,9 +706,8 @@ function answerGame(selected){
   }, 650);
 }
 
-function endMatchGame(){
+async function endMatchGame(){
   stopAllGameTimers();
-
   gameStarted = false;
 
   document.getElementById("startGameBtn").disabled = false;
@@ -296,13 +717,20 @@ function endMatchGame(){
 
   document.getElementById("matchGamePage")?.classList.add("hidden");
   document.getElementById("matchResultPage")?.classList.remove("hidden");
-
-  document.getElementById("finalGameScore").innerText = gameScore;
+  document.getElementById("finalGameScore").innerText = `${gameScore} / 100`;
 
   renderLeaderboard();
 
-  if(typeof updateLearnProgress === "function"){
-    updateLearnProgress();
+  const result = await submitLearningScore("matchGame", gameScore);
+
+  showLearningRewardMessage(
+    "matchResultPage",
+    "matchRewardMessage",
+    result
+  );
+
+  if(typeof updateLearningProgress === "function"){
+    updateLearningProgress();
   }
 }
 
@@ -483,6 +911,8 @@ let quizScore = 0;
 let quizAnswered = false;
 
 function openMiniQuizPage(){
+  loadLearningScoreHistory();
+  clearLearningRewardMessage("quizRewardMessage");
   document.getElementById("learnMenuView")?.classList.add("hidden");
   document.getElementById("matchGamePage")?.classList.add("hidden");
   document.getElementById("matchResultPage")?.classList.add("hidden");
@@ -596,23 +1026,33 @@ function updateQuizProgress(){
     `${percent}%`;
 }
 
-function endMiniQuiz(){
+async function endMiniQuiz(){
   document.getElementById("miniQuizPage")?.classList.add("hidden");
   document.getElementById("miniQuizResultPage")?.classList.remove("hidden");
 
   const total = miniQuizQuestions.length;
-  const percent = Math.round((quizScore / total) * 100);
+  const pointScore = Math.min(100, quizScore * 10);
 
-  document.getElementById("finalQuizScore").innerText =
-    `${quizScore} / ${total}`;
-
-  document.getElementById("finalQuizPercent").innerText =
-    `${percent}%`;
+  document.getElementById("finalQuizScore").innerText = `${pointScore} / 100`;
+  document.getElementById("finalQuizPercent").innerText = `ตอบถูก ${quizScore} / ${total} ข้อ`;
 
   localStorage.setItem("lastMiniQuizScore", quizScore);
+
+  const result = await submitLearningScore("miniQuiz", pointScore);
+
+  showLearningRewardMessage(
+    "miniQuizResultPage",
+    "quizRewardMessage",
+    result
+  );
+
+  if(typeof updateLearningProgress === "function"){
+    updateLearningProgress();
+  }
 }
 
 function restartMiniQuiz(){
+  clearLearningRewardMessage("quizRewardMessage");
   document.getElementById("miniQuizResultPage")?.classList.add("hidden");
   document.getElementById("miniQuizPage")?.classList.remove("hidden");
 
@@ -853,8 +1293,12 @@ const speedFlashCards = [
 
 let currentFlashCardIndex = 0;
 let flashCardFlipped = false;
+let viewedFlashCardIds = new Set();
+let flashRewardClaiming = false;
 
 function openSpeedFlashCardPage(){
+  loadLearningScoreHistory();
+  clearLearningRewardMessage("flashRewardMessage");
   document.getElementById("learnMenuView")?.classList.add("hidden");
   document.getElementById("matchGamePage")?.classList.add("hidden");
   document.getElementById("matchResultPage")?.classList.add("hidden");
@@ -864,12 +1308,15 @@ function openSpeedFlashCardPage(){
 
   currentFlashCardIndex = 0;
   flashCardFlipped = false;
+  viewedFlashCardIds = new Set();
+  flashRewardClaiming = false;
 
   renderSpeedFlashCard();
 }
 
 function renderSpeedFlashCard(){
   const card = speedFlashCards[currentFlashCardIndex];
+  viewedFlashCardIds.add(card.id);
 
   const flashCard = document.getElementById("flashCard");
   const progressFill = document.getElementById("flashProgressFill");
@@ -923,7 +1370,7 @@ function renderSpeedFlashCard(){
 
     // 2. ดึงสีตามตัวอักษรของ card (สมมติว่าตัวแปรชื่อ card.letter หรือ card.type นะครับ)
     // ถ้าหาตัวอักษรไม่เจอ จะใช้สีเริ่มต้นเป็น card.color
-    backCard.style.background = colorMap[card.letter] || card.color; 
+    backCard.style.background = card.color || colorMap[card.speed] || "#168354"; 
   }
 
   updateFlashNavButtons();
@@ -934,14 +1381,16 @@ function updateFlashNavButtons(){
   const nextBtn = document.getElementById("flashNextBtn");
 
   if(prevBtn){
-    prevBtn.disabled = currentFlashCardIndex === 0;
+    prevBtn.disabled = currentFlashCardIndex === 0 || flashRewardClaiming;
   }
 
   if(nextBtn){
     const isLastCard = currentFlashCardIndex === speedFlashCards.length - 1;
 
-    nextBtn.disabled = isLastCard;
-    nextBtn.innerText = isLastCard ? "ครบแล้ว 🌱" : "ถัดไป ▶";
+    nextBtn.disabled = flashRewardClaiming;
+    nextBtn.innerText = isLastCard
+      ? "รับคะแนน 100 🌱"
+      : "ถัดไป ▶";
   }
 }
 
@@ -954,8 +1403,44 @@ function flipSpeedFlashCard(){
   flashCard.classList.toggle("flipped", flashCardFlipped);
 }
 
-function nextFlashCard(){
-  if(currentFlashCardIndex >= speedFlashCards.length - 1){
+async function nextFlashCard(){
+  const isLastCard = currentFlashCardIndex >= speedFlashCards.length - 1;
+
+  if(isLastCard){
+    if(flashRewardClaiming){
+      return;
+    }
+
+    if(viewedFlashCardIds.size < speedFlashCards.length){
+      showLearningRewardMessage(
+        "speedFlashCardPage",
+        "flashRewardMessage",
+        {
+          success:false,
+          message:`ยังเปิดไม่ครบ ตอนนี้เปิดแล้ว ${viewedFlashCardIds.size} / ${speedFlashCards.length} ใบ`
+        }
+      );
+      return;
+    }
+
+    flashRewardClaiming = true;
+    updateFlashNavButtons();
+
+    const result = await submitLearningScore("speedFlashCard", 100);
+
+    flashRewardClaiming = false;
+    updateFlashNavButtons();
+
+    showLearningRewardMessage(
+      "speedFlashCardPage",
+      "flashRewardMessage",
+      result
+    );
+
+    if(typeof updateLearningProgress === "function"){
+      updateLearningProgress();
+    }
+
     return;
   }
 
